@@ -13,7 +13,12 @@ import Sidebar from '@/components/Sidebar.vue'
 import ItemContainer from '@/components/ItemContainer.vue'
 
 export default {
-  name: 'browser',
+  name: 'Browser',
+  components: {
+    Toolbar,
+    Sidebar,
+    ItemContainer
+  },
   data () {
     return {
       path: null,
@@ -21,16 +26,15 @@ export default {
       loading: false
     }
   },
-  components: {
-    Toolbar,
-    Sidebar,
-    ItemContainer
+  created () {
+    this.setPath()
   },
   methods: {
     getItems (path) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        axios.get(`//localhost:3000/listdir?path=${path || ''}`)
+        axios
+          .get(`//localhost:3000/listdir?path=${path || ''}`)
           .catch(reject)
           .then(items => {
             this.items = items.data
@@ -64,9 +68,6 @@ export default {
           })
       }
     }
-  },
-  created () {
-    this.setPath()
   }
 }
 </script>

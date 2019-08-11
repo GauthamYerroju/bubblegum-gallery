@@ -11,7 +11,7 @@
 import HeaderBar from '@/components/HeaderBar.vue'
 
 export default {
-  name: 'settings',
+  name: 'Settings',
   components: {
     HeaderBar
   }
