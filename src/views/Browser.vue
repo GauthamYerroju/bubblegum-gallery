@@ -2,12 +2,14 @@
   div.browser
     Toolbar
     //- Sidebar
+    div {{ appPath }}
     ItemContainer(:items="items" @open="openItem")
 </template>
 
 <script>
 // @ is an alias to /src
-import axios from 'axios'
+import path from 'path'
+import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import ItemContainer from '@/components/ItemContainer.vue'
@@ -21,51 +23,47 @@ export default {
   },
   data () {
     return {
-      path: null,
       items: [],
       loading: false
     }
   },
+  computed: {
+    ...mapGetters({
+      appPath: 'app/getPath'
+    })
+  },
   created () {
-    this.setPath()
+    this.getItems(this.appPath)
   },
   methods: {
+    ...mapActions({
+      appSetPath: 'app/setPath',
+      apiGetItems: 'api/getItems'
+    }),
     getItems (path) {
       this.loading = true
-      return new Promise((resolve, reject) => {
-        axios
-          .get(`//localhost:3000/listdir?path=${path || ''}`)
-          .catch(reject)
-          .then(items => {
-            this.items = items.data
-          })
-          .finally(() => {
-            this.loading = false
-          })
-      })
+      if (path === this.path) {
+        return
+      }
+      this.apiGetItems(path)
+        .catch(console.error)
+        .then(({ data }) => {
+          this.items = data
+          this.appSetPath(path)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
     openItem (item) {
       if (this.loading) {
         return
       }
+      const newPath = path.join(this.appPath, item.name)
       if (item.dir) {
-        this.setPath(item.path)
+        this.getItems(newPath)
       } else {
-        alert(item.path)
-      }
-    },
-    setPath (path) {
-      path = path || ''
-      if (path !== this.path) {
-        const that = this
-        this.getItems(path)
-          .catch(err => {
-            console.error(err)
-            alert(err)
-          })
-          .then(() => {
-            that.path = path
-          })
+        alert(item.name)
       }
     }
   }
