@@ -17,7 +17,10 @@
 export default {
   name: 'HeaderBar',
   props: {
-    name: String,
+    name: {
+      type: String,
+      default: ''
+    },
     fixed: {
       type: Boolean,
       default: false

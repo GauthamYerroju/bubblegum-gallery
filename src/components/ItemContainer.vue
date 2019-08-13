@@ -19,8 +19,14 @@ export default {
     Item
   },
   props: {
-    headerText: null,
-    items: Array
+    headerText: {
+      type: String,
+      default: ''
+    },
+    items: {
+      type: Array,
+      default: () => []
+    }
   }
 }
 </script>

@@ -14,7 +14,13 @@
 export default {
   name: 'Item',
   props: {
-    item: Object
+    item: {
+      type: Object,
+      default: () => ({
+        dir: true,
+        thumb: null
+      })
+    }
   },
   methods: {
     renderItem () {
