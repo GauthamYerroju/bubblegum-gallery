@@ -1,14 +1,15 @@
 <template lang="pug">
-  div.browser
+  .browser.is-relative
+    .loading-overlay.is-overlay(:class="{'is-hidden': !loading}") // TODO: Might need to move this to ItemContainer
     Toolbar
     //- Sidebar
-    div {{ appPath }}
+    div {{ path }}
     ItemContainer(:items="items" @open="openItem")
 </template>
 
 <script>
 // @ is an alias to /src
-import path from 'path'
+import pathlib from 'path'
 import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
@@ -23,6 +24,7 @@ export default {
   },
   data () {
     return {
+      path: '',
       items: [],
       loading: false
     }
@@ -30,10 +32,47 @@ export default {
   computed: {
     ...mapGetters({
       appPath: 'app/getPath'
-    })
+    }),
+    queryPath () {
+      return this.$route.query.path
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      if (this.path === this.queryPath) {
+        return
+      }
+      this.getItems(this.queryPath)
+        .then(currentPath => {
+          this.path = currentPath
+          this.appSetPath(this.path)
+        })
+        .catch(this.handleError)
+    },
+    'appPath' (newPath, oldPath) {
+      if (newPath === this.path) {
+        return
+      }
+      this.getItems(newPath)
+        .then(currentPath => {
+          this.path = currentPath
+          if (this.path !== this.queryPath) {
+            this.$router.push(`${this.$route.path}?path=${this.path}`)
+          }
+        })
+        .catch(err => {
+          this.appSetPath(this.path)
+          this.handleError(err)
+        })
+    }
   },
   created () {
-    this.getItems(this.appPath)
+    this.getItems(this.appPath || this.queryPath)
+      .then(currentPath => {
+        this.path = currentPath
+        this.appSetPath(this.path)
+      })
+      .catch(this.handleError)
   },
   methods: {
     ...mapActions({
@@ -42,30 +81,45 @@ export default {
     }),
     getItems (path) {
       this.loading = true
-      if (path === this.path) {
-        return
-      }
-      this.apiGetItems(path)
-        .catch(console.error)
-        .then(({ data }) => {
-          this.items = data
-          this.appSetPath(path)
-        })
-        .finally(() => {
-          this.loading = false
-        })
+      return new Promise((resolve, reject) => {
+        this.apiGetItems(path)
+          .then(({ data }) => {
+            resolve(path)
+            this.items = data
+          })
+          .catch(err => {
+            reject(err)
+            this.handleError(err)
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      })
     },
     openItem (item) {
       if (this.loading) {
         return
       }
-      const newPath = path.join(this.appPath, item.name)
       if (item.dir) {
-        this.getItems(newPath)
+        const newPath = pathlib.join(this.path, item.name)
+        this.appSetPath(newPath)
       } else {
         alert(item.name)
       }
+    },
+    handleError (err) {
+      console.log(err)
     }
   }
 }
 </script>
+
+<style scoped>
+.browser {
+  height: 100%;
+}
+.loading-overlay {
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
+}
+</style>
