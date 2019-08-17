@@ -1,16 +1,18 @@
 <template lang="pug">
-  div.item.card(@click="$emit('open', item)")
+  div.item(@click="$emit('open', item)")
     div.item-actions
     div.item-content
-      span(v-if="item.dir") ???
-      div(v-if="!item.dir")
-        img(v-if="item.src" :src="item.src")
-        span(v-if="!item.src") No Thumb
+      span(v-if="renderItem.dir") ???
+      div(v-if="!renderItem.dir")
+        img(v-if="renderItem.src" :src="renderItem.src")
+        span(v-if="!renderItem.src") No Thumb
     div.item-name
       | {{ item.name }}
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Item',
   props: {
@@ -22,13 +24,14 @@ export default {
       })
     }
   },
-  methods: {
+  computed: {
+    ...mapGetters('sources', ['urlGetFile', 'urlGetThumbnail']),
     renderItem () {
       const item = this.item
       if (item.thumb) {
-        item.src = `//localhost://3000/get-thumbnail?path=${item.thumb}`
+        item.src = this.urlGetThumbnail(item.thumb)
       } else if (item.useSrc) {
-        item.src = `//localhost:3000/get-file?path=${item.path}`
+        item.src = this.urlGetFile(item.path)
       }
       return item
     }
