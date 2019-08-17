@@ -21,10 +21,8 @@ const storeApp = {
     }
   },
   actions: {
-    setPath ({ commit, state }, path) {
-      if (path !== state.path) {
-        commit('SET_PATH', path)
-      }
+    setPath ({ commit }, path) {
+      commit('SET_PATH', path)
     }
   }
 }
