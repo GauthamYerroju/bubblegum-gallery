@@ -3,7 +3,8 @@
     .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
     Toolbar(:path="path")
     //- Sidebar
-    ItemContainer(:items="items" @open="openItem")
+    div.scroll-container
+      ItemContainer(:items="items" @open="openItem")
 </template>
 
 <script>
@@ -116,6 +117,10 @@ export default {
 <style scoped>
 .browser {
   height: 100%;
+}
+.scroll-container {
+  height: 100%;
+  overflow: auto;
 }
 .loading-overlay {
   z-index: 100;
