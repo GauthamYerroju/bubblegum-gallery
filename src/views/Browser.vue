@@ -1,9 +1,8 @@
 <template lang="pug">
   .browser.is-relative
-    .loading-overlay.is-overlay(:class="{'is-hidden': !loading}") // TODO: Might need to move this to ItemContainer
-    Toolbar
+    .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
+    Toolbar(:path="path")
     //- Sidebar
-    div {{ path }}
     ItemContainer(:items="items" @open="openItem")
 </template>
 

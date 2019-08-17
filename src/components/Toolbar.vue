@@ -9,8 +9,19 @@
           span(aria-hidden='true')
       #navbar-menu.navbar-menu(:class="{ 'is-active': isMenuOpen }")
         .navbar-start
-          a.navbar-item
-            | Home
+          nav.breadcrumb(aria-label="breadcrumbs")
+            ul
+              li(@click="setPath(-1)")
+                a.is-paddingless
+                  span.icon
+                    i.fas.fa-home(aria-hidden="true")
+              li(
+                v-for="(part, i) in parts"
+                :key="i"
+                :class="{'is-active': (i == parts.length - 1)}"
+                @click="setPath(i)"
+              )
+                a(href="#") {{ part }}
         .navbar-end
           .navbar-item
             a.button(fixed @click="goToSettings()")
@@ -20,6 +31,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'Toolbar',
   data () {
@@ -27,7 +40,29 @@ export default {
       isMenuOpen: false
     }
   },
+  props: {
+    path: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    parts () {
+      return this.path.split('/')
+    }
+  },
   methods: {
+    ...mapActions({
+      appSetPath: 'app/setPath'
+    }),
+    setPath (i) {
+      if (i === -1) {
+        this.appSetPath('')
+      } else {
+        this.parts.splice(i + 1)
+        this.appSetPath(this.parts.join('/'))
+      }
+    },
     toggleBurgerMenu () {
       this.isMenuOpen = !this.isMenuOpen
     },
