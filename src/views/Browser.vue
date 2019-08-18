@@ -48,7 +48,7 @@ export default {
       const plusOne = this.appSortAsc ? 1 : -1
       const result = Array.from(this.items)
       result.forEach((item, i) => {
-        item.key = i
+        item.key = this.path + i
       })
       return result.sort((a, b) => {
         if (a[sortKey] === b[sortKey]) {
