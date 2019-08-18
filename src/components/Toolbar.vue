@@ -8,7 +8,7 @@
           span(aria-hidden='true')
       #navbar-menu.navbar-menu(:class="{ 'is-active': isMenuOpen }")
         .navbar-start
-          nav.breadcrumb.level(aria-label="breadcrumbs")
+          nav.level.breadcrumb.has-succeeds-separator(aria-label="breadcrumbs")
             ul
               li(@click="setPath(-1)")
                 a.is-paddingless
