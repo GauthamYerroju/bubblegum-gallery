@@ -2,10 +2,10 @@
   div.item.is-clipped(@click="$emit('open', item)")
     div.item-actions
     div.item-content
-      span(v-if="renderItem.dir") ???
-      img.box.is-paddingless(v-if="!renderItem.dir && renderItem.src" :src="renderItem.src")
+      img(v-if="renderItem.dir" src="/img/folder.svg")
+      img.box.is-paddingless.item-media(v-if="!renderItem.dir && renderItem.src" :src="renderItem.src")
       span(v-if="!renderItem.dir && !renderItem.src") No Thumb
-    div.item-name
+    div.item-name.has-text-centered
       | {{ item.name }}
 </template>
 
@@ -54,7 +54,7 @@ export default {
   width: 300px;
   height: 300px;
 }
-.item-content > img {
+.item-content > .item-media {
   max-width: 100%;
   max-height: 100%;
   margin-left: auto;
