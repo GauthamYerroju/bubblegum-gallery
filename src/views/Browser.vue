@@ -46,7 +46,11 @@ export default {
       else if (this.appSortBy === 'size') sortKey = 'size'
 
       const plusOne = this.appSortAsc ? 1 : -1
-      return Array.from(this.items).sort((a, b) => {
+      const result = Array.from(this.items)
+      result.forEach((item, i) => {
+        item.key = i
+      })
+      return result.sort((a, b) => {
         if (a[sortKey] === b[sortKey]) {
           // Tie-break by name
           return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)

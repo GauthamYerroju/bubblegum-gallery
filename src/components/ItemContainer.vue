@@ -4,7 +4,7 @@
     div
       item(
           v-for="item in items"
-          :key="item.id"
+          :key="item.key"
           :item="item"
           @open="$emit('open', item)"
       )
