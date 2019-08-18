@@ -68,7 +68,7 @@ export default {
       appSegment: 'app/getSegment'
     }),
     parts () {
-      return this.appPath.split('/')
+      return (this.appPath === '') ? [] : this.appPath.split('/')
     }
   },
   methods: {
