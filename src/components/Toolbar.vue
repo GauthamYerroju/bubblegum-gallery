@@ -47,7 +47,7 @@
           .navbar-item
             a.button.is-dark(@click="goToSettings")
               span.icon
-                i.fas.fa-sliders-h
+                i.fas.fa-cog
 </template>
 
 <script>
