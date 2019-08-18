@@ -136,7 +136,7 @@ export default {
 <style scoped>
 .browser {
   height: 100%;
-  margin-top: 3.25rem;
+  padding-top: 3.25rem; /* For fixed top toolbar */
 }
 .scroll-container {
   height: 100%;
