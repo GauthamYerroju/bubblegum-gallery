@@ -1,7 +1,6 @@
 <template lang="pug">
   div.toolbar
-    nav.navbar
-    nav.navbar.is-fixed-top(role='navigation' aria-label='main navigation')
+    nav.navbar.is-dark.is-fixed-top(role='navigation' aria-label='main navigation')
       .navbar-brand
         a.navbar-burger.burger(role='button' aria-label='menu' aria-expanded='false' data-target='navbar-menu' :class="{ 'is-active': isMenuOpen }" @click="toggleBurgerMenu")
           span(aria-hidden='true')
@@ -9,7 +8,7 @@
           span(aria-hidden='true')
       #navbar-menu.navbar-menu(:class="{ 'is-active': isMenuOpen }")
         .navbar-start
-          nav.breadcrumb(aria-label="breadcrumbs")
+          nav.breadcrumb.level(aria-label="breadcrumbs")
             ul
               li(@click="setPath(-1)")
                 a.is-paddingless
@@ -24,14 +23,35 @@
                 a(href="#") {{ part }}
         .navbar-end
           .navbar-item
-            a.button(fixed @click="goToSettings()")
+            .buttons.has-addons
+              a.button.is-dark(@click="appSetSortBy('alpha')" :class="{'is-primary': appSortBy === 'alpha'}")
+                span.icon
+                  i.fas.fa-font
+              a.button.is-dark(@click="appSetSortBy('mtime')" :class="{'is-primary': appSortBy === 'mtime'}")
+                span.icon
+                  i.fas.fa-clock
+              a.button.is-dark(@click="appSetSortBy('type')" :class="{'is-primary': appSortBy === 'type'}")
+                span.icon
+                  i.fas.fa-shapes
+              a.button.is-dark(@click="appSetSortBy('size')" :class="{'is-primary': appSortBy === 'size'}")
+                span.icon
+                  i.fas.fa-chart-bar
+          .navbar-item
+            a.button.is-dark(@click="appSetSortAsc(!appSortAsc)")
+              span.icon
+                i.fas(:class="`fa-sort-amount-down${appSortAsc ? '-alt' : ''}`")
+          .navbar-item
+            a.button.is-dark(@click="appSetSegment(!appSegment)" :class="{'is-primary': appSegment}")
+              span.icon
+                i.fas.fa-list-ul
+          .navbar-item
+            a.button.is-dark(@click="goToSettings")
               span.icon
                 i.fas.fa-sliders-h
-
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Toolbar',
@@ -40,20 +60,23 @@ export default {
       isMenuOpen: false
     }
   },
-  props: {
-    path: {
-      type: String,
-      default: ''
-    }
-  },
   computed: {
+    ...mapGetters({
+      appPath: 'app/getPath',
+      appSortBy: 'app/getSortBy',
+      appSortAsc: 'app/getSortAsc',
+      appSegment: 'app/getSegment'
+    }),
     parts () {
-      return this.path.split('/')
+      return this.appPath.split('/')
     }
   },
   methods: {
     ...mapActions({
-      appSetPath: 'app/setPath'
+      appSetPath: 'app/setPath',
+      appSetSortBy: 'app/setSortBy',
+      appSetSortAsc: 'app/setSortAsc',
+      appSetSegment: 'app/setSegment'
     }),
     setPath (i) {
       if (i === -1) {

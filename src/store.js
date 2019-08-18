@@ -8,21 +8,51 @@ Vue.use(Vuex)
 const storeApp = {
   namespaced: true,
   state: {
-    path: ''
+    path: '',
+    sortBy: 'alpha',
+    sortAsc: true,
+    segment: true
   },
   getters: {
     getPath (state) {
       return state.path
+    },
+    getSortBy (state) {
+      return state.sortBy
+    },
+    getSortAsc (state) {
+      return state.sortAsc
+    },
+    getSegment (state) {
+      return state.segment
     }
   },
   mutations: {
-    SET_PATH (state, path) {
-      state.path = path
+    SET_PATH (state, val) {
+      state.path = val
+    },
+    SET_SORT_BY (state, val) {
+      state.sortBy = val
+    },
+    SET_SORT_ASC (state, val) {
+      state.sortAsc = val
+    },
+    SET_SEGMENT (state, val) {
+      state.segment = val
     }
   },
   actions: {
-    setPath ({ commit }, path) {
-      commit('SET_PATH', path)
+    setPath ({ commit }, val) {
+      commit('SET_PATH', val)
+    },
+    setSortBy ({ commit }, val) {
+      commit('SET_SORT_BY', val)
+    },
+    setSortAsc ({ commit }, val) {
+      commit('SET_SORT_ASC', val)
+    },
+    setSegment ({ commit }, val) {
+      commit('SET_SEGMENT', val)
     }
   }
 }

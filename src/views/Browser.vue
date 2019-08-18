@@ -1,10 +1,10 @@
 <template lang="pug">
-  .browser.is-relative
+  .browser.is-relative.has-text-light.has-background-dark
     .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
-    Toolbar(:path="path")
+    Toolbar
     //- Sidebar
     div.scroll-container
-      ItemContainer(:items="items" @open="openItem")
+      ItemContainer(:items="renderItems" @open="openItem")
 </template>
 
 <script>
@@ -31,10 +31,29 @@ export default {
   },
   computed: {
     ...mapGetters({
-      appPath: 'app/getPath'
+      appPath: 'app/getPath',
+      appSortBy: 'app/getSortBy',
+      appSortAsc: 'app/getSortAsc',
+      appSegment: 'app/getSegment'
     }),
     queryPath () {
       return this.$route.query.path
+    },
+    renderItems () {
+      let sortKey = 'name'
+      if (this.appSortBy === 'mtime') sortKey = 'mtime'
+      else if (this.appSortBy === 'type') sortKey = 'ext'
+      else if (this.appSortBy === 'size') sortKey = 'size'
+
+      const plusOne = this.appSortAsc ? 1 : -1
+      return Array.from(this.items).sort((a, b) => {
+        if (a[sortKey] === b[sortKey]) {
+          // Tie-break by name
+          return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
+        } else {
+          return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
+        }
+      })
     }
   },
   watch: {
@@ -117,6 +136,7 @@ export default {
 <style scoped>
 .browser {
   height: 100%;
+  margin-top: 3.25rem;
 }
 .scroll-container {
   height: 100%;
