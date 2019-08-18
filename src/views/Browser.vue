@@ -61,6 +61,10 @@ export default {
     }
   },
   watch: {
+    // Changing path will update route
+    // Changing route will update path
+    // Avoid recursion by checking for same path
+    // (and only do it here, keep everywhere else clean)
     '$route' (to, from) {
       if (this.path === this.queryPath) {
         return
