@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     div.header(v-if="headerText") {{ headerText }}
-    div
+    div.items
       item(
           v-for="item in items"
           :key="item.key"
@@ -38,5 +38,10 @@ export default {
   text-align: center;
   width: 100%;
   padding: 0.2rem 0.5rem;
+}
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 </style>

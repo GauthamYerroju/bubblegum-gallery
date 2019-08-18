@@ -42,16 +42,16 @@ export default {
 .item {
   display: inline-block;
   margin: 1rem;
+  width: 300px;
 }
 .item-action {
-  max-width: 300px;
+  width: 100%;
 }
 .item-name {
-  max-width: 300px;
-  padding: 1rem;
+  white-space: nowrap;
 }
 .item-content {
-  width: 300px;
+  width: 100%;
   height: 300px;
 }
 .item-content > .item-media {
