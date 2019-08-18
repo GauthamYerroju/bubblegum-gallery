@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     div.header(v-if="headerText") {{ headerText }}
-    div.item-container
+    div
       item(
           v-for="item in items"
           :key="item.id"
@@ -32,9 +32,6 @@ export default {
 </script>
 
 <style scoped>
-.item-container {
-  margin: 0.2rem;
-}
 .header {
   color: gray;
   background-color: rgba(0, 0, 0, 0.25);

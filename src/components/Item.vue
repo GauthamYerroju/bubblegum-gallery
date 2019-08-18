@@ -1,11 +1,10 @@
 <template lang="pug">
-  div.item(@click="$emit('open', item)")
+  div.item.is-clipped(@click="$emit('open', item)")
     div.item-actions
     div.item-content
       span(v-if="renderItem.dir") ???
-      div(v-if="!renderItem.dir")
-        img(v-if="renderItem.src" :src="renderItem.src")
-        span(v-if="!renderItem.src") No Thumb
+      img.box.is-paddingless(v-if="!renderItem.dir && renderItem.src" :src="renderItem.src")
+      span(v-if="!renderItem.dir && !renderItem.src") No Thumb
     div.item-name
       | {{ item.name }}
 </template>
@@ -42,7 +41,23 @@ export default {
 <style scoped>
 .item {
   display: inline-block;
+  margin: 1rem;
+}
+.item-action {
+  max-width: 300px;
+}
+.item-name {
+  max-width: 300px;
+  padding: 1rem;
+}
+.item-content {
   width: 300px;
-  height: 200px;
+  height: 300px;
+}
+.item-content > img {
+  max-width: 100%;
+  max-height: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>
