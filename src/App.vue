@@ -5,6 +5,7 @@
 
 <script>
 // @ is an alias to /src
+import 'bulma/css/bulma.css'
 
 export default {
   name: 'App',
