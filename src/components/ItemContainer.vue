@@ -49,6 +49,8 @@ export default {
     }
   },
   beforeMount: function () {
+    // Add unique id for lazyload to use
+    // Set id before mount so that it's rendered
     this.id = 'item-container-' + this._uid
   },
   mounted: function () {
