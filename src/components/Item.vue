@@ -3,7 +3,7 @@
     div.item-actions
     div.item-content
       img(v-if="renderItem.dir" src="/img/folder.svg")
-      img.box.is-paddingless.item-media(v-if="!renderItem.dir && renderItem.src" :src="renderItem.src")
+      img.box.is-paddingless.item-media(v-if="!renderItem.dir && renderItem.src" :data-src="renderItem.src")
       span(v-if="!renderItem.dir && !renderItem.src") No Thumb
     div.item-name.has-text-centered
       | {{ item.name }}

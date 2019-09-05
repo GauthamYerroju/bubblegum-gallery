@@ -3,8 +3,7 @@
     .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
     Toolbar
     //- Sidebar
-    div.scroll-container
-      ItemContainer(:items="renderItems" @open="openItem")
+    ItemContainer(:items="renderItems" @open="openItem")
 </template>
 
 <script>
@@ -35,6 +34,8 @@ export default {
       appSortBy: 'app/getSortBy',
       appSortAsc: 'app/getSortAsc',
       appSegment: 'app/getSegment'
+      // TODO: Implement segmenting (should this be here or server-side?)
+      // TODO: Decide UI for database view
     }),
     queryPath () {
       return this.$route.query.path
@@ -94,7 +95,7 @@ export default {
     }
   },
   created () {
-    this.getItems(this.appPath || this.queryPath)
+    this.getItems(this.appPath || this.queryPath || '')
       .then(currentPath => {
         this.path = currentPath
         this.appSetPath(this.path)
@@ -145,10 +146,6 @@ export default {
 .browser {
   height: 100%;
   padding-top: 3.25rem; /* For fixed top toolbar */
-}
-.scroll-container {
-  height: 100%;
-  overflow: auto;
 }
 .loading-overlay {
   z-index: 100;
