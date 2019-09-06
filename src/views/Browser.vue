@@ -24,13 +24,16 @@ export default {
   data () {
     return {
       path: '',
+      searchSpec: '',
       items: [],
       loading: false
     }
   },
   computed: {
     ...mapGetters({
+      appMode: 'app/getMode',
       appPath: 'app/getPath',
+      appSearchSpec: 'app/getSearchSpec',
       appSortBy: 'app/getSortBy',
       appSortAsc: 'app/getSortAsc',
       appSegment: 'app/getSegment'
@@ -39,6 +42,9 @@ export default {
     }),
     queryPath () {
       return this.$route.query.path
+    },
+    querySearch () {
+      return this.$route.query.search
     },
     renderItems () {
       let sortKey = 'name'
@@ -67,21 +73,33 @@ export default {
     // Avoid recursion by checking for same path
     // (and only do it here, keep everywhere else clean)
     '$route' (to, from) {
-      if (this.path === this.queryPath) {
-        return
+      if (this.appMode === 'path') {
+        if (this.path === this.queryPath) {
+          return
+        }
+        this.getPathItems(this.queryPath)
+          .then(currentPath => {
+            this.path = currentPath
+            this.appSetPath(this.path)
+          })
+          .catch(this.handleError)
+      } else {
+        if (this.searchSpec === this.querySearch) {
+          return
+        }
+        this.getSearchItems(this.querySearch)
+          .then(currentSearchSpec => {
+            this.searchSpec = currentSearchSpec
+            this.appSetSearchSpec(this.searchSpec)
+          })
+          .catch(this.handleError)
       }
-      this.getItems(this.queryPath)
-        .then(currentPath => {
-          this.path = currentPath
-          this.appSetPath(this.path)
-        })
-        .catch(this.handleError)
     },
     'appPath' (newPath, oldPath) {
       if (newPath === this.path) {
         return
       }
-      this.getItems(newPath)
+      this.getPathItems(newPath)
         .then(currentPath => {
           this.path = currentPath
           if (this.path !== this.queryPath) {
@@ -92,27 +110,75 @@ export default {
           this.appSetPath(this.path)
           this.handleError(err)
         })
+    },
+    'appSearchSpec' (newSpec, oldSpec) {
+      // TODO: test this
+      if (newSpec === this.searchSpec) {
+        return
+      }
+      this.getSearchItems(newSpec)
+        .then(currentSearchSpec => {
+          this.searchSpec = currentSearchSpec
+          if (this.searchSpec !== this.querySearch) {
+            this.$router.push(`${this.$route.path}?search=${this.querySearch}`)
+          }
+        })
+        .catch(err => {
+          this.appSetSearchSpec(this.searchSpec)
+          this.handleError(err)
+        })
     }
   },
   created () {
-    this.getItems(this.appPath || this.queryPath || '')
-      .then(currentPath => {
-        this.path = currentPath
-        this.appSetPath(this.path)
-      })
-      .catch(this.handleError)
+    if (this.appMode === 'path') {
+      this.getPathItems(this.appPath || this.queryPath || '')
+        .then(currentPath => {
+          this.path = currentPath
+          this.appSetPath(this.path)
+        })
+        .catch(this.handleError)
+    } else {
+      this.getSearchItems(this.appSearchSpec || this.querySearch || '')
+        .then(currentSearchSpec => {
+          this.searchSpec = currentSearchSpec
+          this.appSetSearchSpec(this.searchSpec)
+        })
+        .catch(this.handleError)
+    }
   },
   methods: {
     ...mapActions({
       appSetPath: 'app/setPath',
-      apiGetItems: 'api/getItems'
+      appSetSearchSpec: 'app/setSearchSpec',
+      appSetModeToPath: 'app/setModeToPath',
+      appSetModeToSearch: 'app/setModeToSearch',
+      apiGetPathItems: 'api/getPathItems',
+      apiGetSearchItems: 'api/getSearchItems'
     }),
-    getItems (path) {
+    getPathItems (path) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.apiGetItems(path)
+        this.apiGetPathItems(path)
           .then(({ data }) => {
             resolve(path)
+            this.items = data
+          })
+          .catch(err => {
+            reject(err)
+            this.handleError(err)
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      })
+    },
+    getSearchItems (searchSpec) {
+      // TODO: Check if you need to keep track of pages/items, etc.
+      this.loading = true
+      return new Promise((resolve, reject) => {
+        this.apiGetSearchItems(searchSpec)
+          .then(({ data }) => {
+            resolve(searchSpec)
             this.items = data
           })
           .catch(err => {

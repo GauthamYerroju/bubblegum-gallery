@@ -8,14 +8,22 @@ Vue.use(Vuex)
 const storeApp = {
   namespaced: true,
   state: {
+    mode: '',
     path: '',
+    searchSpec: '',
     sortBy: 'alpha',
     sortAsc: true,
     segment: true
   },
   getters: {
+    getMode (state) {
+      return state.mode
+    },
     getPath (state) {
       return state.path
+    },
+    getSearchSpec (state) {
+      return state.searchSpec
     },
     getSortBy (state) {
       return state.sortBy
@@ -28,8 +36,14 @@ const storeApp = {
     }
   },
   mutations: {
+    SET_MODE (state, val) {
+      state.mode = val
+    },
     SET_PATH (state, val) {
       state.path = val
+    },
+    SET_SEARCH_SPEC (state, val) {
+      state.searchSpec = val
     },
     SET_SORT_BY (state, val) {
       state.sortBy = val
@@ -42,8 +56,17 @@ const storeApp = {
     }
   },
   actions: {
+    setModeToPath ({ commit }) {
+      commit('SET_MODE', 'path')
+    },
+    setModeToSearch ({ commit }) {
+      commit('SET_MODE', 'search')
+    },
     setPath ({ commit }, val) {
       commit('SET_PATH', val)
+    },
+    setSearchSpec ({ commit }, val) {
+      commit('SET_SEARCH_SPEC', val)
     },
     setSortBy ({ commit }, val) {
       commit('SET_SORT_BY', val)
@@ -67,6 +90,7 @@ const storeSources = {
         domain: 'localhost',
         port: 3000,
         url: {
+          search: 'search?q=',
           listDir: 'listdir?path=',
           getFile: 'get-file?path=',
           getThumbnail: 'get-thumbnail?path='
@@ -85,6 +109,9 @@ const storeSources = {
         url += `:${src.port}`
       }
       return url
+    },
+    urlSearch: (state, getters) => (searchSpec) => {
+      return `${getters.baseUrl}/${getters.currentSource.url.search}${searchSpec}`
     },
     urlListDir: (state, getters) => (path) => {
       return `${getters.baseUrl}/${getters.currentSource.url.listDir}${path}`
@@ -122,7 +149,10 @@ const storeApi = {
     // Throttle, debounce and queue logic will go here
   },
   actions: {
-    getItems ({ rootGetters }, path) {
+    getSearchItems ({ rootGetters }, searchSpec) {
+      return axios.get(rootGetters['sources/urlSearch'](searchSpec))
+    },
+    getPathItems ({ rootGetters }, path) {
       return axios.get(rootGetters['sources/urlListDir'](path))
     },
     getFile ({ rootGetters }, path) {
