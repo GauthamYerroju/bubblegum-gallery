@@ -194,12 +194,22 @@ export default {
       if (this.loading) {
         return
       }
-      if (item.dir) {
-        const newPath = pathlib.join(this.path, item.name)
-        this.appSetPath(newPath)
+      if (this.appMode === 'path') {
+        if (item.dir) {
+          this.__openDir(item)
+        } else {
+          this.__openFile(item)
+        }
       } else {
-        alert(item.name)
+        this.__openFile(item)
       }
+    },
+    __openDir (item) {
+      const newPath = pathlib.join(this.path, item.name)
+      this.appSetPath(newPath)
+    },
+    __openFile (item) {
+      alert(item.name)
     },
     handleError (err) {
       console.log(err)

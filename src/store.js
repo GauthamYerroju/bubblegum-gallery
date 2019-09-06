@@ -8,7 +8,7 @@ Vue.use(Vuex)
 const storeApp = {
   namespaced: true,
   state: {
-    mode: '',
+    mode: 'path',
     path: '',
     searchSpec: '',
     sortBy: 'alpha',
