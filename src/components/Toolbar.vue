@@ -10,10 +10,10 @@
         .navbar-start
           .navbar-item
             .buttons.has-addons
-              a.button.is-dark(@click="appSetModeToSearch" :class="{'is-primary': appMode === 'search'}")
+              a.button.is-dark(@click="appSetModeToSearch" :class="{'is-info': appMode === 'search'}")
                 span.icon
                   i.fas.fa-database
-              a.button.is-dark(@click="appSetModeToPath" :class="{'is-primary': appMode === 'path'}")
+              a.button.is-dark(@click="appSetModeToPath" :class="{'is-info': appMode === 'path'}")
                 span.icon
                   i.fas.fa-folder
           .navbar-item.search-bars(v-if="appMode === 'search'")
@@ -39,16 +39,16 @@
         .navbar-end
           .navbar-item
             .buttons.has-addons
-              a.button.is-dark(@click="appSetSortBy('alpha')" :class="{'is-primary': appSortBy === 'alpha'}")
+              a.button.is-dark(@click="appSetSortBy('alpha')" :class="{'is-info': appSortBy === 'alpha'}")
                 span.icon
                   i.fas.fa-font
-              a.button.is-dark(@click="appSetSortBy('mtime')" :class="{'is-primary': appSortBy === 'mtime'}")
+              a.button.is-dark(@click="appSetSortBy('mtime')" :class="{'is-info': appSortBy === 'mtime'}")
                 span.icon
                   i.fas.fa-clock
-              a.button.is-dark(@click="appSetSortBy('type')" :class="{'is-primary': appSortBy === 'type'}")
+              a.button.is-dark(@click="appSetSortBy('type')" :class="{'is-info': appSortBy === 'type'}")
                 span.icon
                   i.fas.fa-shapes
-              a.button.is-dark(@click="appSetSortBy('size')" :class="{'is-primary': appSortBy === 'size'}")
+              a.button.is-dark(@click="appSetSortBy('size')" :class="{'is-info': appSortBy === 'size'}")
                 span.icon
                   i.fas.fa-chart-bar
           .navbar-item
@@ -56,7 +56,7 @@
               span.icon
                 i.fas(:class="`fa-sort-amount-down${appSortAsc ? '-alt' : ''}`")
           .navbar-item
-            a.button.is-dark(@click="appSetSegment(!appSegment)" :class="{'is-primary': appSegment}")
+            a.button.is-dark(@click="appSetSegment(!appSegment)" :class="{'is-info': appSegment}")
               span.icon
                 i.fas.fa-list-ul
           .navbar-item
