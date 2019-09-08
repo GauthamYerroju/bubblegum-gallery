@@ -53,11 +53,12 @@ export default {
 .item-content {
   width: 100%;
   height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .item-content > .item-media {
   max-width: 100%;
   max-height: 100%;
-  margin-left: auto;
-  margin-right: auto;
 }
 </style>
