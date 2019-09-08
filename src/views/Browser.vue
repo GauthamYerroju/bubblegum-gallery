@@ -41,10 +41,10 @@ export default {
       // TODO: Decide UI for database view
     }),
     queryPath () {
-      return this.$route.query.path
+      return this.$route.query.path || ''
     },
     querySearchSpec () {
-      return this.$route.query.search
+      return this.$route.query.search || ''
     },
     url () {
       return `${this.$route.path}?mode=${this.appMode}&${(this.appMode === 'path' ? 'path' : 'search')}=${(this.appMode === 'path' ? this.appPath : this.appSearchSpec)}`
