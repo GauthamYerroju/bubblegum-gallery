@@ -85,6 +85,9 @@ export default {
     '$route' (to, from) {
       if (this.appMode === 'path') {
         if (this.path === this.queryPath) {
+          if (this.$route.fullPath !== this.url) {
+            this.$router.replace(this.url)
+          }
           return
         }
         this.getPathItems(this.queryPath)
@@ -95,6 +98,9 @@ export default {
           .catch(this.handleError)
       } else {
         if (this.searchSpec === this.querySearchSpec) {
+          if (this.$route.fullPath !== this.url) {
+            this.$router.replace(this.url)
+          }
           return
         }
         this.getSearchItems(this.querySearchSpec)
@@ -107,13 +113,16 @@ export default {
     },
     'appPath' (newPath, oldPath) {
       if (newPath === this.path) {
+        if (this.$route.fullPath !== this.url) {
+          this.$router.replace(this.url)
+        }
         return
       }
       this.getPathItems(newPath)
         .then(currentPath => {
           this.path = currentPath
           if (this.path !== this.queryPath) {
-            this.$router.push(`${this.url}`)
+            this.$router.push(this.url)
           }
         })
         .catch(err => {
@@ -122,15 +131,17 @@ export default {
         })
     },
     'appSearchSpec' (newSpec, oldSpec) {
-      // TODO: test this
       if (newSpec === this.searchSpec) {
+        if (this.$route.fullPath !== this.url) {
+          this.$router.replace(this.url)
+        }
         return
       }
       this.getSearchItems(newSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
           if (this.searchSpec !== this.querySearchSpec) {
-            this.$router.push(`${this.url}`)
+            this.$router.push(this.url)
           }
         })
         .catch(err => {
@@ -141,19 +152,29 @@ export default {
   },
   created () {
     if (this.appMode === 'path') {
-      this.getPathItems(this.appPath || this.queryPath || '')
+      this.getPathItems(this.appPath || this.queryPath)
         .then(currentPath => {
           this.path = currentPath
           this.appSetPath(this.path)
         })
         .catch(this.handleError)
+        .finally(() => {
+          if (this.$route.fullPath !== this.url) {
+            this.$router.replace(this.url)
+          }
+        })
     } else {
-      this.getSearchItems(this.appSearchSpec || this.querySearchSpec || '')
+      this.getSearchItems(this.appSearchSpec || this.querySearchSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
           this.appSetSearchSpec(this.searchSpec)
         })
         .catch(this.handleError)
+        .finally(() => {
+          if (this.$route.fullPath !== this.url) {
+            this.$router.replace(this.url)
+          }
+        })
     }
   },
   methods: {
