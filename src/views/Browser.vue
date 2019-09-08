@@ -83,6 +83,7 @@ export default {
     // Avoid recursion by checking for same path
     // (and only do it here, keep everywhere else clean)
     '$route' (to, from) {
+      // TODO: This is getting hard to scale. This is done for path and search string, but now I gotta do this for mode. I need to generalized this.
       if (this.appMode === 'path') {
         if (this.path === this.queryPath) {
           if (this.$route.fullPath !== this.url) {

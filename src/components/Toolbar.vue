@@ -8,7 +8,21 @@
           span(aria-hidden='true')
       #navbar-menu.navbar-menu(:class="{ 'is-active': isMenuOpen }")
         .navbar-start
-          nav.level.breadcrumb.has-succeeds-separator(aria-label="breadcrumbs")
+          .navbar-item
+            .buttons.has-addons
+              a.button.is-dark(@click="appSetModeToSearch" :class="{'is-primary': appMode === 'search'}")
+                span.icon
+                  i.fas.fa-database
+              a.button.is-dark(@click="appSetModeToPath" :class="{'is-primary': appMode === 'path'}")
+                span.icon
+                  i.fas.fa-folder
+          .navbar-item.search-bars(v-if="appMode === 'search'")
+            input.input(
+              type="text"
+              v-model="searchText"
+              @keydown.enter="appSetSearchSpec(searchText)"
+            )
+          nav.level.breadcrumb.has-succeeds-separator(aria-label="breadcrumbs" v-if="appMode === 'path'")
             ul
               li(@click="setPath(-1)")
                 a.is-paddingless
@@ -57,12 +71,15 @@ export default {
   name: 'Toolbar',
   data () {
     return {
-      isMenuOpen: false
+      isMenuOpen: false,
+      searchText: ''
     }
   },
   computed: {
     ...mapGetters({
+      appMode: 'app/getMode',
       appPath: 'app/getPath',
+      appSearchSpec: 'app/getSearchSpec',
       appSortBy: 'app/getSortBy',
       appSortAsc: 'app/getSortAsc',
       appSegment: 'app/getSegment'
@@ -76,7 +93,10 @@ export default {
       appSetPath: 'app/setPath',
       appSetSortBy: 'app/setSortBy',
       appSetSortAsc: 'app/setSortAsc',
-      appSetSegment: 'app/setSegment'
+      appSetSegment: 'app/setSegment',
+      appSetModeToPath: 'app/setModeToPath',
+      appSetModeToSearch: 'app/setModeToSearch',
+      appSetSearchSpec: 'app/setSearchSpec'
     }),
     setPath (i) {
       if (i === -1) {
