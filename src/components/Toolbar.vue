@@ -16,7 +16,7 @@
               a.button.is-dark(@click="appSetModeToPath" :class="{'is-info': appMode === 'path'}")
                 span.icon
                   i.fas.fa-folder
-          .navbar-item.search-bars(v-if="appMode === 'search'")
+          .navbar-item(v-if="appMode === 'search'")
             input.input(
               type="text"
               ref="searchbar"
