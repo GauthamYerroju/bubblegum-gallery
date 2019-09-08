@@ -43,8 +43,11 @@ export default {
     queryPath () {
       return this.$route.query.path
     },
-    querySearch () {
+    querySearchSpec () {
       return this.$route.query.search
+    },
+    url () {
+      return `${this.$route.path}?mode=${this.appMode}&${(this.appMode === 'path' ? 'path' : 'search')}=${(this.appMode === 'path' ? this.appPath : this.appSearchSpec)}`
     },
     renderItems () {
       let sortKey = 'name'
@@ -84,10 +87,10 @@ export default {
           })
           .catch(this.handleError)
       } else {
-        if (this.searchSpec === this.querySearch) {
+        if (this.searchSpec === this.querySearchSpec) {
           return
         }
-        this.getSearchItems(this.querySearch)
+        this.getSearchItems(this.querySearchSpec)
           .then(currentSearchSpec => {
             this.searchSpec = currentSearchSpec
             this.appSetSearchSpec(this.searchSpec)
@@ -103,7 +106,7 @@ export default {
         .then(currentPath => {
           this.path = currentPath
           if (this.path !== this.queryPath) {
-            this.$router.push(`${this.$route.path}?path=${this.path}`)
+            this.$router.push(`${this.url}`)
           }
         })
         .catch(err => {
@@ -119,8 +122,8 @@ export default {
       this.getSearchItems(newSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
-          if (this.searchSpec !== this.querySearch) {
-            this.$router.push(`${this.$route.path}?search=${this.querySearch}`)
+          if (this.searchSpec !== this.querySearchSpec) {
+            this.$router.push(`${this.url}`)
           }
         })
         .catch(err => {
@@ -138,7 +141,7 @@ export default {
         })
         .catch(this.handleError)
     } else {
-      this.getSearchItems(this.appSearchSpec || this.querySearch || '')
+      this.getSearchItems(this.appSearchSpec || this.querySearchSpec || '')
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
           this.appSetSearchSpec(this.searchSpec)
@@ -213,6 +216,7 @@ export default {
     },
     handleError (err) {
       console.log(err)
+      alert(err)
     }
   }
 }
