@@ -19,6 +19,7 @@
           .navbar-item.search-bars(v-if="appMode === 'search'")
             input.input(
               type="text"
+              ref="searchbar"
               v-model="searchText"
               @keydown.enter="appSetSearchSpec(searchText)"
             )

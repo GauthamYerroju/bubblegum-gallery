@@ -1,7 +1,7 @@
 <template lang="pug">
   .browser.is-relative.has-text-light.has-background-dark
     .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
-    Toolbar
+    Toolbar(ref="toolbar")
     //- Sidebar
     ItemContainer(:items="renderItems" @open="openItem")
 </template>
@@ -152,6 +152,7 @@ export default {
     }
   },
   created () {
+    window.addEventListener('keydown', this.onkey)
     if (this.appMode === 'path') {
       this.getPathItems(this.appPath || this.queryPath)
         .then(currentPath => {
@@ -177,6 +178,9 @@ export default {
           }
         })
     }
+  },
+  beforeDestroy: function () {
+    window.removeEventListener('keydown', this.onkey)
   },
   methods: {
     ...mapActions({
@@ -242,6 +246,12 @@ export default {
     },
     __openFile (item) {
       alert(item.name)
+    },
+    onkey (ev) {
+      if (this.appMode === 'search' && ev.altKey && ev.code === 'KeyF') {
+        this.$refs.toolbar.$refs.searchbar.focus()
+        ev.preventDefault()
+      }
     },
     handleError (err) {
       console.log(err)
