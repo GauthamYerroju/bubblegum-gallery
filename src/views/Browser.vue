@@ -9,6 +9,7 @@
 <script>
 // @ is an alias to /src
 import pathlib from 'path'
+import querystring from 'querystring'
 import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
@@ -47,7 +48,13 @@ export default {
       return this.$route.query.search || ''
     },
     url () {
-      return `${this.$route.path}?mode=${this.appMode}&${(this.appMode === 'path' ? 'path' : 'search')}=${(this.appMode === 'path' ? this.appPath : this.appSearchSpec)}`
+      const params = { mode: this.appMode }
+      if (this.appMode === 'path' && this.appPath) {
+        params['path'] = this.appPath
+      } else if (this.appMode === 'search' && this.appSearchSpec) {
+        params['search'] = this.appSearchSpec
+      }
+      return `${this.$route.path}?${querystring.stringify(params)}`
     },
     renderItems () {
       let sortKey = 'name'
