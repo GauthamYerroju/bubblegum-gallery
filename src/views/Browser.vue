@@ -3,7 +3,9 @@
     .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
     Toolbar(ref="toolbar")
     //- Sidebar
-    ItemContainer(:items="renderItems" @open="openItem")
+    Gallery(v-if="galleryOpen")
+    div(v-if="!galleryOpen")
+      ItemContainer(:items="renderItems" @open="openItem")
 </template>
 
 <script>
@@ -13,6 +15,7 @@ import querystring from 'querystring'
 import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
+import Gallery from '@/components/Gallery.vue'
 import ItemContainer from '@/components/ItemContainer.vue'
 
 export default {
@@ -20,6 +23,7 @@ export default {
   components: {
     Toolbar,
     Sidebar,
+    Gallery,
     ItemContainer
   },
   data () {
@@ -27,7 +31,8 @@ export default {
       path: '',
       searchSpec: '',
       items: [],
-      loading: false
+      loading: false,
+      galleryOpen: false
     }
   },
   computed: {
@@ -246,6 +251,7 @@ export default {
     },
     __openFile (item) {
       alert(item.name)
+      this.galleryOpen = true
     },
     onkey (ev) {
       if (this.appMode === 'search' && ev.altKey && ev.code === 'KeyF') {
