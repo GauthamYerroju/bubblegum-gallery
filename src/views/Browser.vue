@@ -3,8 +3,13 @@
     .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
     Toolbar(ref="toolbar")
     //- Sidebar
-    Gallery(v-if="galleryOpen")
-    div.scroll-container.full-height(v-if="!galleryOpen")
+    Gallery(
+      v-if="appGalleryKey"
+      :items="renderItems"
+      :currentKey="appGalleryKey"
+      @keyChange="appSetGalleryKey"
+    )
+    div.scroll-container.full-height
       ItemContainer(:items="renderItems" @open="openItem")
 </template>
 
@@ -31,8 +36,7 @@ export default {
       path: '',
       searchSpec: '',
       items: [],
-      loading: false,
-      galleryOpen: false
+      loading: false
     }
   },
   computed: {
@@ -42,7 +46,8 @@ export default {
       appSearchSpec: 'app/getSearchSpec',
       appSortBy: 'app/getSortBy',
       appSortAsc: 'app/getSortAsc',
-      appSegment: 'app/getSegment'
+      appSegment: 'app/getSegment',
+      appGalleryKey: 'app/getGalleryKey',
       // TODO: Implement segmenting (should this be here or server-side?)
       // TODO: Decide UI for database view
     }),
@@ -193,6 +198,7 @@ export default {
       appSetSearchSpec: 'app/setSearchSpec',
       appSetModeToPath: 'app/setModeToPath',
       appSetModeToSearch: 'app/setModeToSearch',
+      appSetGalleryKey: 'app/setGalleryKey',
       apiGetPathItems: 'api/getPathItems',
       apiGetSearchItems: 'api/getSearchItems'
     }),
@@ -250,8 +256,7 @@ export default {
       this.appSetPath(newPath)
     },
     __openFile (item) {
-      alert(item.name)
-      this.galleryOpen = true
+      this.appSetGalleryKey(item.key)
     },
     onkey (ev) {
       if (this.appMode === 'search' && ev.altKey && ev.code === 'KeyF') {
