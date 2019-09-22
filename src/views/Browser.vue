@@ -4,7 +4,7 @@
     Toolbar(ref="toolbar")
     //- Sidebar
     Gallery(v-if="galleryOpen")
-    div(v-if="!galleryOpen")
+    div.scroll-container.full-height(v-if="!galleryOpen")
       ItemContainer(:items="renderItems" @open="openItem")
 </template>
 

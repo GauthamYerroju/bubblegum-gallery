@@ -62,10 +62,6 @@ export default {
 </script>
 
 <style scoped>
-.item-container {
-  height: 100%;
-  overflow: auto;
-}
 .header {
   color: gray;
   background-color: rgba(0, 0, 0, 0.25);
