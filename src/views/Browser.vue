@@ -47,7 +47,7 @@ export default {
       appSortBy: 'app/getSortBy',
       appSortAsc: 'app/getSortAsc',
       appSegment: 'app/getSegment',
-      appGalleryKey: 'app/getGalleryKey',
+      appGalleryKey: 'app/getGalleryKey'
       // TODO: Implement segmenting (should this be here or server-side?)
       // TODO: Decide UI for database view
     }),

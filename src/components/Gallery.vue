@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  name: "Gallery",
+  name: 'Gallery',
   props: {
     currentKey: {
       type: String,
@@ -42,7 +42,7 @@ export default {
   methods: {
     changeToNextItem () {
       let index = this.currentIndex + 1
-      if (index == this.items.length) {
+      if (index === this.items.length) {
         index = 0
       }
       this.$emit('keyChange', this.items[index].key)
@@ -64,7 +64,7 @@ export default {
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
