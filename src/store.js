@@ -14,7 +14,7 @@ const storeApp = {
     sortBy: 'alpha',
     sortAsc: true,
     segment: true,
-    galleryKey: null,
+    galleryKey: null
   },
   getters: {
     getMode (state) {
@@ -37,7 +37,7 @@ const storeApp = {
     },
     getGalleryKey (state) {
       return state.galleryKey
-    },
+    }
   },
   mutations: {
     SET_MODE (state, val) {
@@ -60,7 +60,7 @@ const storeApp = {
     },
     SET_GALLERY_KEY (state, val) {
       state.galleryKey = val
-    },
+    }
   },
   actions: {
     setModeToPath ({ commit }) {
@@ -84,7 +84,7 @@ const storeApp = {
     setSegment ({ commit }, val) {
       commit('SET_SEGMENT', val)
     },
-    setGalleryKey ( { commit }, val) {
+    setGalleryKey ({ commit }, val) {
       commit('SET_GALLERY_KEY', val)
     }
   }
