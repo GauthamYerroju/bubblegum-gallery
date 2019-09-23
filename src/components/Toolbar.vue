@@ -76,6 +76,9 @@ export default {
       searchText: ''
     }
   },
+  created () {
+    this.searchText = this.appSearchSpec
+  },
   computed: {
     ...mapGetters({
       appMode: 'app/getMode',
