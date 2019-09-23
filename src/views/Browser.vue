@@ -4,7 +4,7 @@
     Toolbar(ref="toolbar")
     //- Sidebar
     Gallery(
-      v-if="appGalleryKey"
+      v-if="appGalleryKey && !loading"
       :items="renderItems"
       :currentKey="appGalleryKey"
       @keyChange="appSetGalleryKey"
@@ -15,6 +15,7 @@
 
 <script>
 // @ is an alias to /src
+import slug from 'slug'
 import pathlib from 'path'
 import querystring from 'querystring'
 import { mapActions, mapGetters } from 'vuex'
@@ -51,21 +52,6 @@ export default {
       // TODO: Implement segmenting (should this be here or server-side?)
       // TODO: Decide UI for database view
     }),
-    queryPath () {
-      return this.$route.query.path || ''
-    },
-    querySearchSpec () {
-      return this.$route.query.search || ''
-    },
-    url () {
-      const params = { mode: this.appMode }
-      if (this.appMode === 'path' && this.appPath) {
-        params['path'] = this.appPath
-      } else if (this.appMode === 'search' && this.appSearchSpec) {
-        params['search'] = this.appSearchSpec
-      }
-      return `${this.$route.path}?${querystring.stringify(params)}`
-    },
     renderItems () {
       let sortKey = 'name'
       if (this.appSortBy === 'mtime') sortKey = 'mtime'
@@ -74,8 +60,8 @@ export default {
 
       const plusOne = this.appSortAsc ? 1 : -1
       const result = Array.from(this.items)
-      result.forEach((item, i) => {
-        item.key = this.path + i
+      result.forEach((item) => {
+        item.key = slug(`${this.path}-${item.name}`)
       })
       return result.sort((a, b) => {
         if (a[sortKey] === b[sortKey]) {
@@ -88,53 +74,10 @@ export default {
     }
   },
   watch: {
-    // Changing path will update route
-    // Changing route will update path
-    // Avoid recursion by checking for same path
-    // (and only do it here, keep everywhere else clean)
-    '$route' (to, from) {
-      // TODO: This is getting hard to scale. This is done for path and search string, but now I gotta do this for mode. I need to generalized this.
-      if (this.appMode === 'path') {
-        if (this.path === this.queryPath) {
-          if (this.$route.fullPath !== this.url) {
-            this.$router.replace(this.url)
-          }
-          return
-        }
-        this.getPathItems(this.queryPath)
-          .then(currentPath => {
-            this.path = currentPath
-            this.appSetPath(this.path)
-          })
-          .catch(this.handleError)
-      } else {
-        if (this.searchSpec === this.querySearchSpec) {
-          if (this.$route.fullPath !== this.url) {
-            this.$router.replace(this.url)
-          }
-          return
-        }
-        this.getSearchItems(this.querySearchSpec)
-          .then(currentSearchSpec => {
-            this.searchSpec = currentSearchSpec
-            this.appSetSearchSpec(this.searchSpec)
-          })
-          .catch(this.handleError)
-      }
-    },
     'appPath' (newPath, oldPath) {
-      if (newPath === this.path) {
-        if (this.$route.fullPath !== this.url) {
-          this.$router.replace(this.url)
-        }
-        return
-      }
       this.getPathItems(newPath)
         .then(currentPath => {
           this.path = currentPath
-          if (this.path !== this.queryPath) {
-            this.$router.push(this.url)
-          }
         })
         .catch(err => {
           this.appSetPath(this.path)
@@ -142,18 +85,9 @@ export default {
         })
     },
     'appSearchSpec' (newSpec, oldSpec) {
-      if (newSpec === this.searchSpec) {
-        if (this.$route.fullPath !== this.url) {
-          this.$router.replace(this.url)
-        }
-        return
-      }
       this.getSearchItems(newSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
-          if (this.searchSpec !== this.querySearchSpec) {
-            this.$router.push(this.url)
-          }
         })
         .catch(err => {
           this.appSetSearchSpec(this.searchSpec)
@@ -164,29 +98,19 @@ export default {
   created () {
     window.addEventListener('keydown', this.onkey)
     if (this.appMode === 'path') {
-      this.getPathItems(this.appPath || this.queryPath)
+      this.getPathItems(this.appPath)
         .then(currentPath => {
           this.path = currentPath
           this.appSetPath(this.path)
         })
         .catch(this.handleError)
-        .finally(() => {
-          if (this.$route.fullPath !== this.url) {
-            this.$router.replace(this.url)
-          }
-        })
     } else {
-      this.getSearchItems(this.appSearchSpec || this.querySearchSpec)
+      this.getSearchItems(this.appSearchSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
           this.appSetSearchSpec(this.searchSpec)
         })
         .catch(this.handleError)
-        .finally(() => {
-          if (this.$route.fullPath !== this.url) {
-            this.$router.replace(this.url)
-          }
-        })
     }
   },
   beforeDestroy: function () {
