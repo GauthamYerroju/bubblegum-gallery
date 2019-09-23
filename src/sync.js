@@ -1,6 +1,6 @@
 import { stringify } from 'querystring'
-import extend from 'lodash/extend'
-import pickBy from 'lodash/pickBy'
+import keys from 'lodash/keys'
+import union from 'lodash/union'
 import snakeCase from 'lodash/snakeCase'
 
 // Thanks for this: https://stackoverflow.com/questions/44171210/what-is-vuex-router-sync-for
@@ -13,10 +13,9 @@ export default (store, router) => {
       return { mode, path, searchSpec, galleryKey }
     },
     watched => {
-      const q = stringify(pickBy(watched, x => x))
       if (stringify(watched) !== stringify(router.history.current.query)) {
         // TODO: If only difference is galleryOpen, do replace instead of push.
-        router.push( {query: watched} )
+        router.push({ query: watched })
       }
     }
   )
@@ -25,9 +24,13 @@ export default (store, router) => {
     const qTo = to.query
     const qFrom = from.query
     if (stringify(qTo) !== stringify(qFrom)) {
-      // TODO: This is hacky and relies on naming conventions. I can do better.
-      const diff = extend(qFrom, qTo)
-      for(const key in diff) {
+      const diff = {}
+      const kAll = union(keys(qTo), keys(qFrom))
+      for (const key of kAll) {
+        diff[key] = qTo[key]
+      }
+      for (const key in diff) {
+        // TODO: This is hacky and relies on naming conventions. I can do better.
         const mutation = `app/SET_${snakeCase(key).toUpperCase()}`
         store.commit(mutation, diff[key])
       }

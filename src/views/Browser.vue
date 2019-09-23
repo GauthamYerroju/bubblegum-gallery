@@ -17,7 +17,6 @@
 // @ is an alias to /src
 import slug from 'slug'
 import pathlib from 'path'
-import querystring from 'querystring'
 import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'

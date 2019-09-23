@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 const storeApp = {
   namespaced: true,
+  // TODO: Defining defaults twice (in state declaration and getters). Decide where to define them only once.
   state: {
     mode: 'path',
     path: '',
@@ -18,25 +19,27 @@ const storeApp = {
   },
   getters: {
     getMode (state) {
-      return state.mode
+      return state.mode || 'path'
     },
     getPath (state) {
-      return state.path
+      return state.path || ''
     },
     getSearchSpec (state) {
-      return state.searchSpec
+      return state.searchSpec || ''
     },
     getSortBy (state) {
-      return state.sortBy
+      return state.sortBy || 'alpha'
     },
     getSortAsc (state) {
-      return state.sortAsc
+      // eslint-disable-next-line
+      return (state.sortAsc === false) ? false : true // Guard against undefined and null
     },
     getSegment (state) {
-      return state.segment
+      // eslint-disable-next-line
+      return (state.segment === false) ? false : true // Guard against undefined and null
     },
     getGalleryKey (state) {
-      return state.galleryKey
+      return state.galleryKey || null
     }
   },
   mutations: {
