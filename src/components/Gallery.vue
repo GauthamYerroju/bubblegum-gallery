@@ -1,7 +1,7 @@
 <template lang="pug">
-  div.gallery
+  div.gallery(@click="close" @contextmenu="oncontextmenu" @wheel="onwheel")
     div
-      img.gallery-media(:src="currentItem.src")
+      img.gallery-media(:src="currentItem.src" :style="zoomCss")
     //- div.gallery-thumbnails
       div.gallery-thumb(
           v-for="item in items"
@@ -25,12 +25,21 @@ export default {
       default: () => []
     }
   },
+  data () {
+    return {
+      mouseNavigating: false,
+      zoomScale: 1
+    }
+  },
   computed: {
     currentIndex () {
       return this.items.findIndex((x) => x.key === this.currentKey)
     },
     currentItem () {
       return this.items[this.currentIndex]
+    },
+    zoomCss () {
+      return `transform: scale3d(${this.zoomScale}, ${this.zoomScale}, 1);`
     }
   },
   created () {
@@ -54,13 +63,52 @@ export default {
       }
       this.$emit('keyChange', this.items[index].key)
     },
+    close () {
+      this.$emit('keyChange', null)
+    },
+    zoomIn () {
+      const newScale = this.zoomScale + 0.2
+      this.zoomScale = (newScale) >= 10 ? 10 : newScale
+    },
+    zoomOut () {
+      const newScale = this.zoomScale - 0.2
+      this.zoomScale = (newScale) <= 0.2 ? 0.2 : newScale
+    },
     onkey (ev) {
       if (ev.code === 'Escape') {
-        this.$emit('keyChange', null)
+        this.close()
       } else if (ev.code === 'ArrowLeft') {
         this.changeToPrevItem()
       } else if (ev.code === 'ArrowRight') {
         this.changeToNextItem()
+      }
+    },
+    onwheel (ev) {
+      const scrollUp = ev.deltaY < 0
+      const rightBtnDown = ev.buttons === 2
+      if (scrollUp) {
+        if (rightBtnDown) {
+          this.mouseNavigating = true
+          this.zoomScale = 1
+          this.changeToPrevItem()
+        } else {
+          this.zoomIn()
+        }
+      } else {
+        if (rightBtnDown) {
+          this.mouseNavigating = true
+          this.zoomScale = 1
+          this.changeToNextItem()
+        } else {
+          this.zoomOut()
+        }
+      }
+      console.log(this.zoomCss)
+    },
+    oncontextmenu (ev) {
+      if (this.mouseNavigating) {
+        ev.preventDefault()
+        this.mouseNavigating = false
       }
     }
   }
@@ -83,6 +131,7 @@ export default {
   /* height: calc(100% - 20%); */
   height: 100%;
   object-fit: contain;
+  transition: transform 100ms;
 }
 /* .gallery-thumbnails {
   z-index: 200;
