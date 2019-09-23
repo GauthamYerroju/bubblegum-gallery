@@ -37,3 +37,5 @@ export default (store, router) => {
     }
   })
 }
+
+// TODO: handle modes: hide keys in url based on mode

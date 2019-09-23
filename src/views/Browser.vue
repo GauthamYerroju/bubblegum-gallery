@@ -73,6 +73,9 @@ export default {
     }
   },
   watch: {
+    'appMode' (newMode, oldMode) {
+      this.loadDefaultItems()
+    },
     'appPath' (newPath, oldPath) {
       this.getPathItems(newPath)
         .then(currentPath => {
@@ -96,21 +99,7 @@ export default {
   },
   created () {
     window.addEventListener('keydown', this.onkey)
-    if (this.appMode === 'path') {
-      this.getPathItems(this.appPath)
-        .then(currentPath => {
-          this.path = currentPath
-          this.appSetPath(this.path)
-        })
-        .catch(this.handleError)
-    } else {
-      this.getSearchItems(this.appSearchSpec)
-        .then(currentSearchSpec => {
-          this.searchSpec = currentSearchSpec
-          this.appSetSearchSpec(this.searchSpec)
-        })
-        .catch(this.handleError)
-    }
+    this.loadDefaultItems()
   },
   beforeDestroy: function () {
     window.removeEventListener('keydown', this.onkey)
@@ -159,6 +148,23 @@ export default {
             this.loading = false
           })
       })
+    },
+    loadDefaultItems () {
+      if (this.appMode === 'path') {
+        this.getPathItems(this.appPath)
+          .then(currentPath => {
+            this.path = currentPath
+            this.appSetPath(this.path)
+          })
+          .catch(this.handleError)
+      } else {
+        this.getSearchItems(this.appSearchSpec)
+          .then(currentSearchSpec => {
+            this.searchSpec = currentSearchSpec
+            this.appSetSearchSpec(this.searchSpec)
+          })
+          .catch(this.handleError)
+      }
     },
     openItem (item) {
       if (this.loading) {
