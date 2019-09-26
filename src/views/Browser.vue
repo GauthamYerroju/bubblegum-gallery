@@ -103,7 +103,18 @@ export default {
           this.appSetSearchSpec(this.searchSpec)
           this.handleError(err)
         })
+    },
+    'appSortBy' (newVal, oldVal) {
+      if (this.appMode === 'search') {
+        this.getSearchItems(this.searchSpec).catch(handleError)
+      }
+    },
+    'appSortAsc' (newVal, oldVal) {
+      if (this.appMode === 'search') {
+        this.getSearchItems(this.searchSpec).catch(handleError)
+      }
     }
+    // TODO: pagination / infinite scrolling
   },
   created () {
     window.addEventListener('keydown', this.onkey)
