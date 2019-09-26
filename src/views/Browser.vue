@@ -48,8 +48,7 @@ export default {
       appSortAsc: 'app/getSortAsc',
       appSegment: 'app/getSegment',
       appGalleryKey: 'app/getGalleryKey'
-      // TODO: Implement segmenting (should this be here or server-side?)
-      // TODO: Decide UI for database view
+      // TODO: Implement segmenting (server serves segments, UI should know how to render them)
     }),
     renderItems () {
       const result = Array.from(this.items)
@@ -151,7 +150,6 @@ export default {
       })
     },
     getSearchItems (searchSpec) {
-      // TODO: Check if you need to keep track of pages/items, etc.
       this.loading = true
       return new Promise((resolve, reject) => {
         this.apiGetSearchItems(searchSpec)
