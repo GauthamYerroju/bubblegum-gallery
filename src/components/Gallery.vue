@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.gallery(@click="close" @contextmenu="oncontextmenu" @wheel="onwheel")
+  div.gallery(v-if="currentItem" @click="close" @contextmenu="oncontextmenu" @wheel="onwheel")
     div
       img.gallery-media(:src="currentItem.src" :style="zoomCss")
     //- div.gallery-thumbnails
