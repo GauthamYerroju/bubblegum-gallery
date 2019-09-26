@@ -13,9 +13,17 @@ export default (store, router) => {
       return { mode, path, searchSpec, sortBy, sortAsc, galleryKey }
     },
     watched => {
-      if (stringify(watched) !== stringify(router.history.current.query)) {
-        // TODO: If only difference is galleryOpen, do replace instead of push.
-        router.push({ query: watched })
+      const oldQuery = router.history.current.query
+      if (stringify(watched) !== stringify(oldQuery)) {
+        let replace = false
+        // If only difference is galleryOpen, do replace instead of push.
+        replace = replace || (oldQuery.galleryKey && watched.path === oldQuery.path && watched.galleryKey !== oldQuery.galleryKey)
+
+        if (replace) {
+          router.replace({ query: watched })
+        } else {
+          router.push({ query: watched })
+        }
       }
     }
   )
