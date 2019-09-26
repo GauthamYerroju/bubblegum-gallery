@@ -39,7 +39,7 @@
         .navbar-end
           .navbar-item
             .buttons.has-addons
-              a.button.is-dark(@click="appSetSortBy('alpha')" :class="{'is-info': appSortBy === 'alpha'}")
+              a.button.is-dark(@click="appSetSortBy('name')" :class="{'is-info': appSortBy === 'name'}")
                 span.icon
                   i.fas.fa-font
               a.button.is-dark(@click="appSetSortBy('mtime')" :class="{'is-info': appSortBy === 'mtime'}")

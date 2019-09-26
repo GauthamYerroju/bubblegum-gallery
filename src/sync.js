@@ -9,8 +9,8 @@ export default (store, router) => {
   // react to store and update route
   store.watch(
     state => {
-      const { mode, path, searchSpec, galleryKey } = state.app
-      return { mode, path, searchSpec, galleryKey }
+      const { mode, path, searchSpec, sortBy, sortAsc, galleryKey } = state.app
+      return { mode, path, searchSpec, sortBy, sortAsc, galleryKey }
     },
     watched => {
       if (stringify(watched) !== stringify(router.history.current.query)) {

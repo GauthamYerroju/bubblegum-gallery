@@ -12,7 +12,7 @@ const storeApp = {
     mode: 'path',
     path: '',
     searchSpec: '',
-    sortBy: 'alpha',
+    sortBy: 'name',
     sortAsc: true,
     segment: true,
     galleryKey: null
@@ -28,7 +28,7 @@ const storeApp = {
       return state.searchSpec || ''
     },
     getSortBy (state) {
-      return state.sortBy || 'alpha'
+      return state.sortBy || 'name'
     },
     getSortAsc (state) {
       // eslint-disable-next-line
@@ -106,7 +106,8 @@ const storeSources = {
           search: 'search?q=',
           listDir: 'listdir?path=',
           getFile: 'get-file?path=',
-          getThumbnail: 'get-thumbnail?path='
+          getThumbnail: 'get-thumbnail?path=',
+          doScan: 'scan'
         }
       }
     }
@@ -123,8 +124,10 @@ const storeSources = {
       }
       return url
     },
-    urlSearch: (state, getters) => (searchSpec) => {
-      return `${getters.baseUrl}/${getters.currentSource.url.search}${searchSpec}`
+    urlSearch: (state, getters, rootGetters) => (searchSpec) => {
+      const sortBy = rootGetters.app.sortBy
+      const sortAsc = rootGetters.app.sortAsc
+      return `${getters.baseUrl}/${getters.currentSource.url.search}${searchSpec}&sortBy=${sortBy}&sortAsc=${sortAsc}`
     },
     urlListDir: (state, getters) => (path) => {
       return `${getters.baseUrl}/${getters.currentSource.url.listDir}${path}`
@@ -134,6 +137,9 @@ const storeSources = {
     },
     urlGetThumbnail: (state, getters) => (path) => {
       return `${getters.baseUrl}/${getters.currentSource.url.getThumbnail}${path}`
+    },
+    urlDoScan: (state, getters) => () => {
+      return `${getters.baseUrl}/${getters.currentSource.url.doScan}`
     }
   },
   mutations: {
@@ -173,7 +179,10 @@ const storeApi = {
     },
     getThumbnail ({ rootGetters }, path) {
       return axios.get(rootGetters['sources/urlListDir'](path))
-    }
+    },
+    doScan ({ rootGetters }) {
+      return axios.get(rootGetters['sources/urlDoScan']())
+    },
   }
 }
 

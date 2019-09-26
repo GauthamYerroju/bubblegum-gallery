@@ -52,24 +52,31 @@ export default {
       // TODO: Decide UI for database view
     }),
     renderItems () {
-      let sortKey = 'name'
-      if (this.appSortBy === 'mtime') sortKey = 'mtime'
-      else if (this.appSortBy === 'type') sortKey = 'ext'
-      else if (this.appSortBy === 'size') sortKey = 'size'
-
-      const plusOne = this.appSortAsc ? 1 : -1
       const result = Array.from(this.items)
       result.forEach((item) => {
         item.key = slug(`${this.path}-${item.name}`)
       })
-      return result.sort((a, b) => {
-        if (a[sortKey] === b[sortKey]) {
-          // Tie-break by name
-          return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
-        } else {
-          return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
-        }
-      })
+
+      if (this.appMode === 'search') {
+        return result
+      } else {
+        let sortKey = 'name'
+        if (this.appSortBy === 'mtime') sortKey = 'mtime'
+        else if (this.appSortBy === 'type') sortKey = 'ext'
+        else if (this.appSortBy === 'size') sortKey = 'size'
+  
+        const plusOne = this.appSortAsc ? 1 : -1
+        const result = Array.from(this.items)
+
+        return result.sort((a, b) => {
+          if (a[sortKey] === b[sortKey]) {
+            // Tie-break by name
+            return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
+          } else {
+            return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
+          }
+        })
+      }
     }
   },
   watch: {
