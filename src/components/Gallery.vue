@@ -103,7 +103,6 @@ export default {
           this.zoomOut()
         }
       }
-      console.log(this.zoomCss)
     },
     oncontextmenu (ev) {
       if (this.mouseNavigating) {
