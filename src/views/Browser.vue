@@ -55,6 +55,7 @@ export default {
       const result = Array.from(this.items)
       result.forEach((item) => {
         item.key = slug(`${this.path}-${item.name}`)
+        item.thumb = item.path // TODO: remove after thumbnails are implemented
       })
 
       if (this.appMode === 'search') {
