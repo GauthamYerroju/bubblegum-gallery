@@ -15,7 +15,7 @@
 
 <script>
 // @ is an alias to /src
-import slug from 'slug'
+import slugify from 'slugify'
 import pathlib from 'path'
 import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
@@ -52,8 +52,8 @@ export default {
     }),
     renderItems () {
       const result = Array.from(this.items)
-      result.forEach((item) => {
-        item.key = slug(`${this.path}-${item.name}`)
+      result.forEach((item, i) => {
+        item.key = slugify(`${this.path}-${item.name}`)
         item.thumb = item.path // TODO: remove after thumbnails are implemented
       })
 
