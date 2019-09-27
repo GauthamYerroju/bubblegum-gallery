@@ -1,6 +1,6 @@
 <template lang="pug">
-  .browser.is-relative.has-text-light.has-background-dark
-    .loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
+  div.browser.is-relative.has-text-light.has-background-dark
+    div.loading-overlay.is-overlay(:class="{'is-hidden': !loading}")
     Toolbar(ref="toolbar")
     //- Sidebar
     Gallery(
@@ -9,7 +9,7 @@
       :currentKey="appGalleryKey"
       @keyChange="appSetGalleryKey"
     )
-    div.scroll-container.full-height
+    div.scroll-container.full-height(ref="lazyloadcontainer")
       ItemContainer(:items="renderItems" @open="openItem")
 </template>
 
@@ -18,6 +18,7 @@
 import slugify from 'slugify'
 import pathlib from 'path'
 import { mapActions, mapGetters } from 'vuex'
+import LazyLoad from 'vanilla-lazyload'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Gallery from '@/components/Gallery.vue'
@@ -36,8 +37,17 @@ export default {
       path: '',
       searchSpec: '',
       items: [],
-      loading: false
+      loading: false,
+      lazyLoader: {
+        type: LazyLoad,
+        default: null
+      }
     }
+  },
+  mounted: function () {
+    this.lazyLoader = new LazyLoad({
+      container: this.$refs.lazyloadcontainer
+    })
   },
   computed: {
     ...mapGetters({
@@ -80,6 +90,11 @@ export default {
     }
   },
   watch: {
+    items: function (newVal, oldVal) {
+      this.$nextTick(() => {
+        this.lazyLoader.update()
+      })
+    },
     'appMode' (newMode, oldMode) {
       this.loadDefaultItems()
     },

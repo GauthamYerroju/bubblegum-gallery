@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.item-container(:id="id")
+  div.item-container
     div.header(v-if="headerText") {{ headerText }}
     div.items
       item(
@@ -12,7 +12,6 @@
 
 <script>
 import Item from '@/components/Item'
-import LazyLoad from 'vanilla-lazyload'
 
 export default {
   name: 'ItemContainer',
@@ -28,35 +27,6 @@ export default {
       type: Array,
       default: () => []
     }
-  },
-  data () {
-    return {
-      id: {
-        type: String,
-        default: null
-      },
-      lazyLoader: {
-        type: LazyLoad,
-        default: null
-      }
-    }
-  },
-  watch: {
-    items: function (newVal, oldVal) {
-      this.$nextTick(() => {
-        this.lazyLoader.update()
-      })
-    }
-  },
-  beforeMount: function () {
-    // Add unique id for lazyload to use
-    // Set id before mount so that it's rendered
-    this.id = 'item-container-' + this._uid
-  },
-  mounted: function () {
-    this.lazyLoader = new LazyLoad({
-      container: document.getElementById(this.id)
-    })
   }
 }
 </script>
