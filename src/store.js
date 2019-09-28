@@ -127,16 +127,16 @@ const storeSources = {
     urlSearch: (state, getters, rootGetters) => (searchSpec) => {
       const sortBy = rootGetters.app.sortBy
       const sortAsc = rootGetters.app.sortAsc
-      return `${getters.baseUrl}/${getters.currentSource.url.search}${searchSpec}&sortBy=${sortBy}&sortAsc=${sortAsc}`
+      return `${getters.baseUrl}/${getters.currentSource.url.search}${encodeURIComponent(searchSpec)}&sortBy=${sortBy}&sortAsc=${sortAsc}`
     },
     urlListDir: (state, getters) => (path) => {
-      return `${getters.baseUrl}/${getters.currentSource.url.listDir}${path}`
+      return `${getters.baseUrl}/${getters.currentSource.url.listDir}${encodeURIComponent(path)}`
     },
     urlGetFile: (state, getters) => (path) => {
-      return `${getters.baseUrl}/${getters.currentSource.url.getFile}${path}`
+      return `${getters.baseUrl}/${getters.currentSource.url.getFile}${encodeURIComponent(path)}`
     },
     urlGetThumbnail: (state, getters) => (path) => {
-      return `${getters.baseUrl}/${getters.currentSource.url.getThumbnail}${path}`
+      return `${getters.baseUrl}/${getters.currentSource.url.getThumbnail}${encodeURIComponent(path)}`
     },
     urlDoScan: (state, getters) => () => {
       return `${getters.baseUrl}/${getters.currentSource.url.doScan}`
