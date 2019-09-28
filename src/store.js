@@ -182,7 +182,7 @@ const storeApi = {
     },
     doScan ({ rootGetters }) {
       return axios.get(rootGetters['sources/urlDoScan']())
-    },
+    }
   }
 }
 

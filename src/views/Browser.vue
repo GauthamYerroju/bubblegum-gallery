@@ -44,11 +44,6 @@ export default {
       }
     }
   },
-  mounted: function () {
-    this.lazyLoader = new LazyLoad({
-      container: this.$refs.lazyloadcontainer
-    })
-  },
   computed: {
     ...mapGetters({
       appMode: 'app/getMode',
@@ -74,7 +69,6 @@ export default {
         if (this.appSortBy === 'mtime') sortKey = 'mtime'
         else if (this.appSortBy === 'type') sortKey = 'ext'
         else if (this.appSortBy === 'size') sortKey = 'size'
-  
         const plusOne = this.appSortAsc ? 1 : -1
         const result = Array.from(this.items)
 
@@ -120,15 +114,20 @@ export default {
     },
     'appSortBy' (newVal, oldVal) {
       if (this.appMode === 'search') {
-        this.getSearchItems(this.searchSpec).catch(handleError)
+        this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     },
     'appSortAsc' (newVal, oldVal) {
       if (this.appMode === 'search') {
-        this.getSearchItems(this.searchSpec).catch(handleError)
+        this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     }
     // TODO: pagination / infinite scrolling
+  },
+  mounted: function () {
+    this.lazyLoader = new LazyLoad({
+      container: this.$refs.lazyloadcontainer
+    })
   },
   created () {
     window.addEventListener('keydown', this.onkey)
@@ -226,7 +225,7 @@ export default {
       }
     },
     handleError (err) {
-      console.log(err)
+      console.error(err)
       alert(err)
     }
   }
