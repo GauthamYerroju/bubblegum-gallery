@@ -17,7 +17,7 @@ const storeApp = {
     page: 0,
     skipPages: 0,
     itemsPerPage: 40,
-    segment: true,
+    segment: false,
     galleryKey: null
   },
   getters: {
@@ -157,9 +157,9 @@ const storeSources = {
     urlSearch: (state, getters, rootGetters) => (searchSpec) => {
       const sortBy = rootGetters.app.sortBy
       const sortAsc = rootGetters.app.sortAsc
-      const skip = rootGetters.app.itemsPerPage * rootGetters.app.skipPages
-      const limit = rootGetters.app.itemsPerPage * rootGetters.app.page
-      return `${getters.baseUrl}/${getters.currentSource.url.search}${encodeURIComponent(searchSpec)}&sortBy=${sortBy}&sortAsc=${sortAsc}&skip=${skip}&limit=${limit}`
+      const limit = rootGetters.app.itemsPerPage
+      const offset = rootGetters.app.itemsPerPage * rootGetters.app.skipPages
+      return `${getters.baseUrl}/${getters.currentSource.url.search}${encodeURIComponent(searchSpec)}&sortBy=${sortBy}&sortAsc=${sortAsc}&offset=${offset}&limit=${limit}`
     },
     urlListDir: (state, getters) => (path) => {
       return `${getters.baseUrl}/${getters.currentSource.url.listDir}${encodeURIComponent(path)}`

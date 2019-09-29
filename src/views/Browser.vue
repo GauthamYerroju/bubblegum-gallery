@@ -97,21 +97,15 @@ export default {
         if (this.appSegment) {
           return this.groupItems(this.pathItems, this.appSortBy)
         }
-        return [{ items: this.pathItems }]
+        return [{ items: this.postProcessItems(this.pathItems) }]
       }
     },
     galleryItems () {
-      const items = (this.appMode === 'search') ? this.dbItems : this.pathItems
-      return items.map(group => group.items).reduce((acc, cur) => { acc += cur }, [])
+      return this.renderGroups.map(group => group.items).reduce((acc, cur) => acc.concat(cur), [])
     }
   },
   watch: {
-    dbItems: function (newVal, oldVal) {
-      this.$nextTick(() => {
-        this.lazyLoader.update()
-      })
-    },
-    pathItems: function (newVal, oldVal) {
+    renderGroups: function (newVal, oldVal) {
       this.$nextTick(() => {
         this.lazyLoader.update()
       })
