@@ -5,20 +5,31 @@
     //- Sidebar
     Gallery(
       v-if="appGalleryKey && !loading"
-      :items="renderItems"
+      :items="galleryItems"
       :currentKey="appGalleryKey"
       @keyChange="appSetGalleryKey"
     )
-    div.scroll-container.full-height(ref="lazyloadcontainer")
-      ItemContainer(:items="renderItems" @open="openItem")
+    div(ref="lazyloadcontainer").scroll-container.full-height
+      ItemContainer(
+        v-for="renderItems in renderGroups"
+        :items="renderItems.items"
+        :key="renderItems.headerText"
+        :headerText="renderItems.headerText"
+        @open="openItem"
+      )
+      div.end-marker(
+        ref="endMarker"
+      ) End Marker
 </template>
 
 <script>
 // @ is an alias to /src
-import slugify from 'slugify'
 import pathlib from 'path'
-import { mapActions, mapGetters } from 'vuex'
+import slugify from 'slugify'
 import LazyLoad from 'vanilla-lazyload'
+import { groupBy, findKey } from 'lodash'
+import { DateTime, Interval } from 'luxon'
+import { mapActions, mapGetters } from 'vuex'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Gallery from '@/components/Gallery.vue'
@@ -36,11 +47,30 @@ export default {
     return {
       path: '',
       searchSpec: '',
-      items: [],
+      dbItems: [],
+      pathItems: [],
       loading: false,
       lazyLoader: {
         type: LazyLoad,
         default: null
+      },
+      observer: null,
+      intervals: {
+        'today': { name: 'Today', sortIndex: 1, is: (now, t) => Interval.after(now.startOf('day'), { 'days': 1 }).contains(t) },
+        'yesterday': { name: 'Yesterday', sortIndex: 2, is: (now, t) => Interval.before(now.startOf('day'), { 'days': 1 }).contains(t) },
+        'thisWeek': { name: 'This Week', sortIndex: 3, is: (now, t) => Interval.after(now.startOf('week'), { 'weeks': 1 }).contains(t) },
+        'lastWeek': { name: 'Last Week', sortIndex: 4, is: (now, t) => Interval.before(now.startOf('week'), { 'weeks': 1 }).contains(t) },
+        '2WeeksAgo': { name: '2 Weeks Ago', sortIndex: 5, is: (now, t) => Interval.before(now.startOf('week'), { 'weeks': 2 }).contains(t) },
+        '3WeeksAgo': { name: '3 Weeks Ago', sortIndex: 6, is: (now, t) => Interval.before(now.startOf('week'), { 'weeks': 3 }).contains(t) },
+        'thisMonth': { name: 'This Month', sortIndex: 7, is: (now, t) => Interval.after(now.startOf('month'), { 'months': 1 }).contains(t) },
+        'lastMonth': { name: 'Last Month', sortIndex: 8, is: (now, t) => Interval.before(now.startOf('month'), { 'months': 1 }).contains(t) },
+        'thisYear': { name: 'This Year', sortIndex: 9, is: (now, t) => Interval.after(now.startOf('year'), { 'years': 1 }).contains(t) },
+        'lastYear': { name: 'Last Year', sortIndex: 10, is: (now, t) => Interval.before(now.startOf('year'), { 'years': 1 }).contains(t) },
+        'older': { name: 'Older', sortIndex: 11, is: (now, t) => t.year < now.year - 1 },
+        'other': { name: 'Other', sortIndex: 12 }
+      },
+      sizes: {
+        'tiny': { name: 'Tiny', sortIndex: 1, is: (size) => true }
       }
     }
   },
@@ -51,40 +81,37 @@ export default {
       appSearchSpec: 'app/getSearchSpec',
       appSortBy: 'app/getSortBy',
       appSortAsc: 'app/getSortAsc',
+      appPage: 'app/getPage',
+      appSkipPages: 'app/getSkipPages',
+      appItemsPerPage: 'app/getItemsPerPage',
       appSegment: 'app/getSegment',
       appGalleryKey: 'app/getGalleryKey'
-      // TODO: Implement segmenting (server serves segments, UI should know how to render them)
     }),
-    renderItems () {
-      const result = Array.from(this.items)
-      result.forEach((item, i) => {
-        item.key = slugify(`${this.path}-${item.name}`)
-        item.thumb = item.path // TODO: remove after thumbnails are implemented
-      })
-
+    renderGroups () {
       if (this.appMode === 'search') {
-        return result
+        // DB mode: group by page
+        this.dbItems.forEach(group => { group.items = this.postProcessItems(group.items) })
+        return this.dbItems
       } else {
-        let sortKey = 'name'
-        if (this.appSortBy === 'mtime') sortKey = 'mtime'
-        else if (this.appSortBy === 'type') sortKey = 'ext'
-        else if (this.appSortBy === 'size') sortKey = 'size'
-        const plusOne = this.appSortAsc ? 1 : -1
-        const result = Array.from(this.items)
-
-        return result.sort((a, b) => {
-          if (a[sortKey] === b[sortKey]) {
-            // Tie-break by name
-            return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
-          } else {
-            return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
-          }
-        })
+        // Folder mode: group by sorting
+        if (this.appSegment) {
+          return this.groupItems(this.pathItems, this.appSortBy)
+        }
+        return [{ items: this.pathItems }]
       }
+    },
+    galleryItems () {
+      const items = (this.appMode === 'search') ? this.dbItems : this.pathItems
+      return items.map(group => group.items).reduce((acc, cur) => { acc += cur }, [])
     }
   },
   watch: {
-    items: function (newVal, oldVal) {
+    dbItems: function (newVal, oldVal) {
+      this.$nextTick(() => {
+        this.lazyLoader.update()
+      })
+    },
+    pathItems: function (newVal, oldVal) {
       this.$nextTick(() => {
         this.lazyLoader.update()
       })
@@ -103,6 +130,7 @@ export default {
         })
     },
     'appSearchSpec' (newSpec, oldSpec) {
+      this.appSetPage(1)
       this.getSearchItems(newSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
@@ -114,45 +142,120 @@ export default {
     },
     'appSortBy' (newVal, oldVal) {
       if (this.appMode === 'search') {
+        this.appSetPage(1)
         this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     },
     'appSortAsc' (newVal, oldVal) {
       if (this.appMode === 'search') {
+        this.appSetPage(1)
         this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     }
-    // TODO: pagination / infinite scrolling
   },
   mounted: function () {
     this.lazyLoader = new LazyLoad({
       container: this.$refs.lazyloadcontainer
     })
-  },
-  created () {
+    this.observer = new IntersectionObserver(([entry]) => {
+      if (entry && entry.isIntersecting) {
+        this.loadNextPage()
+      }
+    })
     window.addEventListener('keydown', this.onkey)
+    this.appSetPage(1)
     this.loadDefaultItems()
   },
   beforeDestroy: function () {
     window.removeEventListener('keydown', this.onkey)
+    this.observer.disconnect()
   },
   methods: {
     ...mapActions({
       appSetPath: 'app/setPath',
       appSetSearchSpec: 'app/setSearchSpec',
+      appSetPage: 'app/setPage',
+      appSetSkipPages: 'app/setSkipPages',
       appSetModeToPath: 'app/setModeToPath',
       appSetModeToSearch: 'app/setModeToSearch',
       appSetGalleryKey: 'app/setGalleryKey',
       apiGetPathItems: 'api/getPathItems',
       apiGetSearchItems: 'api/getSearchItems'
     }),
+    enableAutoPager () {
+      this.observer.observe(this.$refs.endMarker)
+    },
+    disableAutoPager () {
+      this.observer.unobserve(this.$refs.endMarker)
+    },
+    groupItems (items, groupKey) {
+      // TODO: sorting is working within groups but how do I sort groups?
+      const now = DateTime.local()
+      const sizes = this.sizes
+      const intervals = this.intervals
+      const rawGroups = groupBy(items, item => {
+        if (groupKey === 'mtime') {
+          const mtime = DateTime.fromMillis(parseFloat(item.mtime))
+          return findKey(intervals, i => (i.is && i.is(now, mtime))) || 'other'
+        } else if (groupKey === 'size') {
+          const size = parseInt(item.size)
+          return findKey(sizes, s => (s.is && s.is(size))) || 'other'
+        } else if (groupKey === 'type') {
+          return item.dir ? 'Folder' : (item.ext || 'Unknown')
+        }
+        return 'dont-group'
+      })
+      return Object.entries(rawGroups).map(([key, items]) => {
+        let headerText;
+        if (key === 'dont-group') {
+          headerText = undefined
+        } else if (groupKey === 'mtime') {
+          headerText = intervals[key].name
+        } else if (groupKey === 'size') {
+          headerText = sizes[key].name
+        } else {
+          headerText = key
+        }
+        return {
+          items: this.postProcessItems(items),
+          headerText
+        }
+      })
+    },
+    postProcessItems (items) {
+      const result = Array.from(items)
+      result.forEach((item, i) => {
+        item.key = slugify(`${item.name}-${item.mtime}-${item.xxhash}`)
+        item.thumb = item.path // TODO: remove after thumbnails are implemented
+      })
+
+      if (this.appMode === 'search') {
+        return result
+      } else {
+        let sortKey = 'name'
+        if (this.appSortBy === 'mtime') sortKey = 'mtime'
+        else if (this.appSortBy === 'type') sortKey = 'ext'
+        else if (this.appSortBy === 'size') sortKey = 'size'
+        const plusOne = this.appSortAsc ? 1 : -1
+        const result = Array.from(items)
+
+        return result.sort((a, b) => {
+          if (a[sortKey] === b[sortKey]) {
+            // Tie-break by name
+            return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
+          } else {
+            return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
+          }
+        })
+      }
+    },
     getPathItems (path) {
       this.loading = true
       return new Promise((resolve, reject) => {
         this.apiGetPathItems(path)
           .then(({ data }) => {
             resolve(path)
-            this.items = data
+            this.pathItems = data
           })
           .catch(err => {
             reject(err)
@@ -166,10 +269,39 @@ export default {
     getSearchItems (searchSpec) {
       this.loading = true
       return new Promise((resolve, reject) => {
+        this.disableAutoPager()
         this.apiGetSearchItems(searchSpec)
           .then(({ data }) => {
+            if (this.appSkipPages !== 0) {
+              // Just load the next page
+              if (data.length > 0) {
+                this.dbItems.push({
+                  headerText: (this.appPage === 1) ? undefined : `Page ${this.appPage}`,
+                  items: data
+                })
+                this.enableAutoPager()
+              }
+            } else {
+              // Load all pages
+              const items = []
+              const pages = Math.ceil(data.length / this.appItemsPerPage)
+              for (let i = 0; i < pages; i++) {
+                const pageItems = data.slice(i * this.appItemsPerPage, (i + 1) * this.appItemsPerPage)
+                if (pageItems.length === 0) {
+                  this.appSetPage(i + 1)
+                  break
+                }
+                items.push({
+                  headerText: (i === 0) ? undefined : `Page ${i + 1}`,
+                  items: pageItems
+                })
+              }
+              this.dbItems = items
+              if (items.length > 0) {
+                this.enableAutoPager()
+              }
+            }
             resolve(searchSpec)
-            this.items = data
           })
           .catch(err => {
             reject(err)
@@ -196,6 +328,15 @@ export default {
           })
           .catch(this.handleError)
       }
+    },
+    loadNextPage () {
+      this.appSetSkipPages(this.appPage)
+      this.appSetPage(this.appPage + 1)
+      this.getSearchItems(this.searchSpec)
+        .catch(this.handleError)
+        .finally(() => {
+          this.appSetSkipPages(0)
+        })
     },
     openItem (item) {
       if (this.loading) {

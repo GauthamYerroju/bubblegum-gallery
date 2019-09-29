@@ -14,6 +14,9 @@ const storeApp = {
     searchSpec: '',
     sortBy: 'name',
     sortAsc: true,
+    page: 0,
+    skipPages: 0,
+    itemsPerPage: 40,
     segment: true,
     galleryKey: null
   },
@@ -33,6 +36,15 @@ const storeApp = {
     getSortAsc (state) {
       // eslint-disable-next-line
       return (state.sortAsc === false) ? false : true // Guard against undefined and null
+    },
+    getPage (state) {
+      return state.page
+    },
+    getSkipPages (state) {
+      return state.skipPages
+    },
+    getItemsPerPage (state) {
+      return state.itemsPerPage
     },
     getSegment (state) {
       // eslint-disable-next-line
@@ -57,6 +69,15 @@ const storeApp = {
     },
     SET_SORT_ASC (state, val) {
       state.sortAsc = val
+    },
+    SET_PAGE (state, val) {
+      state.page = val
+    },
+    SET_SKIP_PAGES (state, val) {
+      state.skipPages = val
+    },
+    SET_ITEMS_PER_PAGE (state, val) {
+      state.itemsPerPage = val
     },
     SET_SEGMENT (state, val) {
       state.segment = val
@@ -83,6 +104,15 @@ const storeApp = {
     },
     setSortAsc ({ commit }, val) {
       commit('SET_SORT_ASC', val)
+    },
+    setPage ({ commit }, val) {
+      commit('SET_PAGE', val)
+    },
+    setSkipPages ({ commit }, val) {
+      commit('SET_SKIP_PAGES', val)
+    },
+    setItemsPerPage ({ commit }, val) {
+      commit('SET_ITEMS_PER_PAGE', val)
     },
     setSegment ({ commit }, val) {
       commit('SET_SEGMENT', val)
@@ -127,7 +157,9 @@ const storeSources = {
     urlSearch: (state, getters, rootGetters) => (searchSpec) => {
       const sortBy = rootGetters.app.sortBy
       const sortAsc = rootGetters.app.sortAsc
-      return `${getters.baseUrl}/${getters.currentSource.url.search}${encodeURIComponent(searchSpec)}&sortBy=${sortBy}&sortAsc=${sortAsc}`
+      const skip = rootGetters.app.itemsPerPage * rootGetters.app.skipPages
+      const limit = rootGetters.app.itemsPerPage * rootGetters.app.page
+      return `${getters.baseUrl}/${getters.currentSource.url.search}${encodeURIComponent(searchSpec)}&sortBy=${sortBy}&sortAsc=${sortAsc}&skip=${skip}&limit=${limit}`
     },
     urlListDir: (state, getters) => (path) => {
       return `${getters.baseUrl}/${getters.currentSource.url.listDir}${encodeURIComponent(path)}`

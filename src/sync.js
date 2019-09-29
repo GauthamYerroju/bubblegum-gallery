@@ -9,8 +9,8 @@ export default (store, router) => {
   // react to store and update route
   store.watch(
     state => {
-      const { mode, path, searchSpec, sortBy, sortAsc, galleryKey } = state.app
-      return { mode, path, searchSpec, sortBy, sortAsc, galleryKey }
+      const { mode, path, searchSpec, page, sortBy, sortAsc, galleryKey } = state.app
+      return { mode, path, searchSpec, page, sortBy, sortAsc, galleryKey }
     },
     watched => {
       const oldQuery = router.history.current.query
