@@ -1,7 +1,7 @@
-import { stringify } from 'querystring'
 import keys from 'lodash/keys'
 import union from 'lodash/union'
 import snakeCase from 'lodash/snakeCase'
+import { stringify } from 'querystring'
 
 // Thanks for this: https://stackoverflow.com/questions/44171210/what-is-vuex-router-sync-for
 
@@ -14,16 +14,16 @@ export default (store, router) => {
     },
     watched => {
       const oldQuery = router.history.current.query
-      if (stringify(watched) !== stringify(oldQuery)) {
-        let replace = false
-        // If only difference is galleryOpen, do replace instead of push.
-        replace = replace || (oldQuery.galleryKey && watched.path === oldQuery.path && watched.galleryKey !== oldQuery.galleryKey)
-
-        if (replace) {
-          router.replace({ query: watched })
-        } else {
-          router.push({ query: watched })
-        }
+      const existTriggers = 'galleryKey'.split(', ')
+      const replaceTriggers = 'mode, path, searchSpec'.split(', ')
+      let push = replaceTriggers.some(trigger => oldQuery[trigger] !== watched[trigger])
+      if (!push) {
+        push = existTriggers.some(trigger => oldQuery[trigger] === null && watched[trigger] !== null)
+      }
+      if (push) {
+        router.push({ query: watched })
+      } else {
+        router.replace({ query: watched })
       }
     }
   )
