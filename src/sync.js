@@ -16,14 +16,16 @@ export default (store, router) => {
       const oldQuery = router.history.current.query
       const existTriggers = 'galleryKey'.split(', ')
       const replaceTriggers = 'mode, path, searchSpec'.split(', ')
-      let push = replaceTriggers.some(trigger => oldQuery[trigger] !== watched[trigger])
-      if (!push) {
-        push = existTriggers.some(trigger => oldQuery[trigger] === null && watched[trigger] !== null)
-      }
-      if (push) {
-        router.push({ query: watched })
-      } else {
-        router.replace({ query: watched })
+      if (stringify(oldQuery) !== stringify(watched)) {
+        let push = replaceTriggers.some(trigger => oldQuery[trigger] !== watched[trigger])
+        if (!push) {
+          push = existTriggers.some(trigger => oldQuery[trigger] === null && watched[trigger] !== null)
+        }
+        if (push) {
+          router.push({ query: watched })
+        } else {
+          router.replace({ query: watched })
+        }
       }
     }
   )
