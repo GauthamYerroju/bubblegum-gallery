@@ -111,6 +111,7 @@ export default {
       })
     },
     'appMode' (newMode, oldMode) {
+      this.disableAutoPager()
       this.loadDefaultItems()
     },
     'appPath' (newPath, oldPath) {
