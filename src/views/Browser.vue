@@ -199,22 +199,48 @@ export default {
         }
         return 'dont-group'
       })
-      return Object.entries(rawGroups).map(([key, items]) => {
-        let headerText;
-        if (key === 'dont-group') {
-          headerText = undefined
-        } else if (groupKey === 'mtime') {
-          headerText = intervals[key].name
-        } else if (groupKey === 'size') {
-          headerText = sizes[key].name
-        } else {
-          headerText = key
-        }
-        return {
-          items: this.postProcessItems(items),
-          headerText
-        }
-      })
+      return Object.entries(rawGroups)
+        .map(([key, items]) => {
+          // eslint-disable-next-line
+          let sortKey = ''
+          let headerText = ''
+          if (key === 'dont-group') {
+            sortKey = undefined
+            headerText = undefined
+          } else if (groupKey === 'mtime') {
+            sortKey = intervals[key].sortIndex
+            headerText = intervals[key].name
+          } else if (groupKey === 'size') {
+            sortKey = sizes[key].sortIndex
+            headerText = sizes[key].name
+          } else {
+            sortKey = key
+            headerText = key
+          }
+          return {
+            sortKey,
+            headerText,
+            items: this.postProcessItems(items)
+          }
+        })
+        .sort((a, b) => {
+          const plusOne = this.appSortAsc ? 1 : -1
+          // Folders always first
+          if (a.sortKey === 'Folder') {
+            if (b.sortKey === 'Folder') {
+              return (a.headerText === b.headerText) ? 0 : ((a.headerText < b.headerText) ? -1 : 1)
+            } else {
+              return -1
+            }
+          }
+          if (a.sortKey === b.sortKey) {
+            // Tie-break by header text
+            return (a.headerText === b.headerText) ? 0 : ((a.headerText < b.headerText) ? -1 : 1)
+          } else {
+            return (a.sortKey < b.sortKey) ? -plusOne : plusOne
+          }
+        })
+      return groups
     },
     postProcessItems (items) {
       const result = Array.from(items)
@@ -222,26 +248,26 @@ export default {
         item.key = slugify(`${item.name}-${item.mtime}-${item.xxhash}`)
         item.thumb = item.path // TODO: remove after thumbnails are implemented
       })
-
+      return this.sortItems(result)
+    },
+    sortItems (items) {
       if (this.appMode === 'search') {
-        return result
-      } else {
-        let sortKey = 'name'
-        if (this.appSortBy === 'mtime') sortKey = 'mtime'
-        else if (this.appSortBy === 'type') sortKey = 'ext'
-        else if (this.appSortBy === 'size') sortKey = 'size'
-        const plusOne = this.appSortAsc ? 1 : -1
-        const result = Array.from(items)
-
-        return result.sort((a, b) => {
-          if (a[sortKey] === b[sortKey]) {
-            // Tie-break by name
-            return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
-          } else {
-            return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
-          }
-        })
+        return items
       }
+      let sortKey = 'name'
+      if (this.appSortBy === 'mtime') sortKey = 'mtime'
+      else if (this.appSortBy === 'type') sortKey = 'ext'
+      else if (this.appSortBy === 'size') sortKey = 'size'
+      const plusOne = this.appSortAsc ? 1 : -1
+      const result = Array.from(items)
+      return result.sort((a, b) => {
+        if (a[sortKey] === b[sortKey]) {
+          // Tie-break by name
+          return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
+        } else {
+          return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
+        }
+      })
     },
     getPathItems (path) {
       this.loading = true
