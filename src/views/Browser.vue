@@ -184,7 +184,6 @@ export default {
       this.observer.unobserve(this.$refs.endMarker)
     },
     groupItems (items, groupKey) {
-      // TODO: sorting is working within groups but how do I sort groups?
       const now = DateTime.local()
       const sizes = this.sizes
       const intervals = this.intervals
@@ -241,7 +240,6 @@ export default {
             return (a.sortKey < b.sortKey) ? -plusOne : plusOne
           }
         })
-      return groups
     },
     postProcessItems (items) {
       const result = Array.from(items)
