@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Gallery',
   props: {
@@ -32,11 +34,13 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('sources', ['urlGetFile']),
     currentIndex () {
       return this.items.findIndex((x) => x.key === this.currentKey)
     },
     currentItem () {
-      return this.items[this.currentIndex]
+      const item = this.items[this.currentIndex]
+      return Object.assign(item, { src: this.urlGetFile(item.path) })
     },
     zoomCss () {
       return `transform: scale3d(${this.zoomScale}, ${this.zoomScale}, 1);`

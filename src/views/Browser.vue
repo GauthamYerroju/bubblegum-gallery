@@ -245,7 +245,6 @@ export default {
       const result = Array.from(items)
       result.forEach((item, i) => {
         item.key = slugify(`${item.name}-${item.mtime}-${item.xxhash}`)
-        item.thumb = item.path // TODO: remove after thumbnails are implemented
       })
       return this.sortItems(result)
     },
