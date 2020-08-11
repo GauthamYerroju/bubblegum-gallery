@@ -208,6 +208,7 @@ export default {
   },
   mounted: function () {
     this.lazyLoader = new LazyLoad({
+      use_native: true,
       container: this.$refs.lazyloadcontainer
     })
     this.observer = new IntersectionObserver(([entry]) => {
