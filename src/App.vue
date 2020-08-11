@@ -1,6 +1,5 @@
 <template lang="pug">
-  #app.full-height
-    router-view
+  router-view
 </template>
 
 <script>

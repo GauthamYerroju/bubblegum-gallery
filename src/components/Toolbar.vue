@@ -51,7 +51,7 @@
             a.button.is-dark(aria-label="Group items" @click="appSetSegment(!appSegment)" :class="{'is-info': appSegment}")
               fa-icon(aria-hidden="true" title="Group items" icon="list-ul")
           .navbar-item
-            a.button.is-dark(aria-label="Open Settings" @click="goToSettings")
+            router-link.button.is-dark(to="/settings" aria-label="Open Settings")
               fa-icon(aria-hidden="true" title="Settings" icon="cog")
 </template>
 
@@ -102,17 +102,6 @@ export default {
     },
     toggleBurgerMenu () {
       this.isMenuOpen = !this.isMenuOpen
-    },
-    goToSettings () {
-      this.$router.push({
-        name: 'settings',
-        params: {
-          returnTo: {
-            name: this.$route.name,
-            params: this.$route.params
-          }
-        }
-      })
     }
   }
 }

@@ -1,6 +1,5 @@
 <template lang="pug">
   div.about
-    HeaderBar(name="About")
     h1 Bubblegum Gallery
     p Version information, current status, license, and information from server through props goes here.
     h2 Icons
@@ -17,13 +16,7 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import HeaderBar from '@/components/HeaderBar.vue'
-
 export default {
-  name: 'About',
-  components: {
-    HeaderBar
-  }
+  name: 'About'
 }
 </script>
