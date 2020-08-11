@@ -56,21 +56,75 @@ export default {
       },
       observer: null,
       intervals: {
-        'today': { name: 'Today', sortIndex: 1, is: (now, t) => Interval.after(now.startOf('day'), { 'days': 1 }).contains(t) },
-        'yesterday': { name: 'Yesterday', sortIndex: 2, is: (now, t) => Interval.before(now.startOf('day'), { 'days': 1 }).contains(t) },
-        'thisWeek': { name: 'This Week', sortIndex: 3, is: (now, t) => Interval.after(now.startOf('week'), { 'weeks': 1 }).contains(t) },
-        'lastWeek': { name: 'Last Week', sortIndex: 4, is: (now, t) => Interval.before(now.startOf('week'), { 'weeks': 1 }).contains(t) },
-        '2WeeksAgo': { name: '2 Weeks Ago', sortIndex: 5, is: (now, t) => Interval.before(now.startOf('week'), { 'weeks': 2 }).contains(t) },
-        '3WeeksAgo': { name: '3 Weeks Ago', sortIndex: 6, is: (now, t) => Interval.before(now.startOf('week'), { 'weeks': 3 }).contains(t) },
-        'thisMonth': { name: 'This Month', sortIndex: 7, is: (now, t) => Interval.after(now.startOf('month'), { 'months': 1 }).contains(t) },
-        'lastMonth': { name: 'Last Month', sortIndex: 8, is: (now, t) => Interval.before(now.startOf('month'), { 'months': 1 }).contains(t) },
-        'thisYear': { name: 'This Year', sortIndex: 9, is: (now, t) => Interval.after(now.startOf('year'), { 'years': 1 }).contains(t) },
-        'lastYear': { name: 'Last Year', sortIndex: 10, is: (now, t) => Interval.before(now.startOf('year'), { 'years': 1 }).contains(t) },
-        'older': { name: 'Older', sortIndex: 11, is: (now, t) => t.year < now.year - 1 },
-        'other': { name: 'Other', sortIndex: 12 }
+        today: {
+          name: 'Today',
+          sortIndex: 1,
+          is: (now, t) =>
+            Interval.after(now.startOf('day'), { days: 1 }).contains(t)
+        },
+        yesterday: {
+          name: 'Yesterday',
+          sortIndex: 2,
+          is: (now, t) =>
+            Interval.before(now.startOf('day'), { days: 1 }).contains(t)
+        },
+        thisWeek: {
+          name: 'This Week',
+          sortIndex: 3,
+          is: (now, t) =>
+            Interval.after(now.startOf('week'), { weeks: 1 }).contains(t)
+        },
+        lastWeek: {
+          name: 'Last Week',
+          sortIndex: 4,
+          is: (now, t) =>
+            Interval.before(now.startOf('week'), { weeks: 1 }).contains(t)
+        },
+        '2WeeksAgo': {
+          name: '2 Weeks Ago',
+          sortIndex: 5,
+          is: (now, t) =>
+            Interval.before(now.startOf('week'), { weeks: 2 }).contains(t)
+        },
+        '3WeeksAgo': {
+          name: '3 Weeks Ago',
+          sortIndex: 6,
+          is: (now, t) =>
+            Interval.before(now.startOf('week'), { weeks: 3 }).contains(t)
+        },
+        thisMonth: {
+          name: 'This Month',
+          sortIndex: 7,
+          is: (now, t) =>
+            Interval.after(now.startOf('month'), { months: 1 }).contains(t)
+        },
+        lastMonth: {
+          name: 'Last Month',
+          sortIndex: 8,
+          is: (now, t) =>
+            Interval.before(now.startOf('month'), { months: 1 }).contains(t)
+        },
+        thisYear: {
+          name: 'This Year',
+          sortIndex: 9,
+          is: (now, t) =>
+            Interval.after(now.startOf('year'), { years: 1 }).contains(t)
+        },
+        lastYear: {
+          name: 'Last Year',
+          sortIndex: 10,
+          is: (now, t) =>
+            Interval.before(now.startOf('year'), { years: 1 }).contains(t)
+        },
+        older: {
+          name: 'Older',
+          sortIndex: 11,
+          is: (now, t) => t.year < now.year - 1
+        },
+        other: { name: 'Other', sortIndex: 12 }
       },
       sizes: {
-        'tiny': { name: 'Tiny', sortIndex: 1, is: (size) => true }
+        tiny: { name: 'Tiny', sortIndex: 1, is: size => true }
       }
     }
   },
@@ -90,7 +144,9 @@ export default {
     renderGroups () {
       if (this.appMode === 'search') {
         // DB mode: group by page
-        this.dbItems.forEach(group => { group.items = this.postProcessItems(group.items) })
+        this.dbItems.forEach(group => {
+          group.items = this.postProcessItems(group.items)
+        })
         return this.dbItems
       } else {
         // Folder mode: group by sorting
@@ -101,7 +157,9 @@ export default {
       }
     },
     galleryItems () {
-      return this.renderGroups.map(group => group.items).reduce((acc, cur) => acc.concat(cur), [])
+      return this.renderGroups
+        .map(group => group.items)
+        .reduce((acc, cur) => acc.concat(cur), [])
     }
   },
   watch: {
@@ -110,11 +168,11 @@ export default {
         this.lazyLoader.update()
       })
     },
-    'appMode' (newMode, oldMode) {
+    appMode (newMode, oldMode) {
       this.disableAutoPager()
       this.loadDefaultItems()
     },
-    'appPath' (newPath, oldPath) {
+    appPath (newPath, oldPath) {
       this.getPathItems(newPath)
         .then(currentPath => {
           this.path = currentPath
@@ -124,7 +182,7 @@ export default {
           this.handleError(err)
         })
     },
-    'appSearchSpec' (newSpec, oldSpec) {
+    appSearchSpec (newSpec, oldSpec) {
       this.appSetPage(1)
       this.getSearchItems(newSpec)
         .then(currentSearchSpec => {
@@ -135,13 +193,13 @@ export default {
           this.handleError(err)
         })
     },
-    'appSortBy' (newVal, oldVal) {
+    appSortBy (newVal, oldVal) {
       if (this.appMode === 'search') {
         this.appSetPage(1)
         this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     },
-    'appSortAsc' (newVal, oldVal) {
+    appSortAsc (newVal, oldVal) {
       if (this.appMode === 'search') {
         this.appSetPage(1)
         this.getSearchItems(this.searchSpec).catch(this.handleError)
@@ -190,19 +248,19 @@ export default {
       const rawGroups = groupBy(items, item => {
         if (groupKey === 'mtime') {
           const mtime = DateTime.fromMillis(parseFloat(item.mtime))
-          return findKey(intervals, i => (i.is && i.is(now, mtime))) || 'other'
+          return findKey(intervals, i => i.is && i.is(now, mtime)) || 'other'
         } else if (groupKey === 'size') {
           const size = parseInt(item.size)
-          return findKey(sizes, s => (s.is && s.is(size))) || 'other'
+          return findKey(sizes, s => s.is && s.is(size)) || 'other'
         } else if (groupKey === 'type') {
-          return item.dir ? 'Folder' : (item.ext || 'Unknown')
+          return item.dir ? 'Folder' : item.ext || 'Unknown'
         }
         return 'dont-group'
       })
       return Object.entries(rawGroups)
         .map(([key, items]) => {
           // eslint-disable-next-line
-          let sortKey = ''
+          let sortKey = "";
           let headerText = ''
           if (key === 'dont-group') {
             sortKey = undefined
@@ -228,16 +286,24 @@ export default {
           // Folders always first
           if (a.sortKey === 'Folder') {
             if (b.sortKey === 'Folder') {
-              return (a.headerText === b.headerText) ? 0 : ((a.headerText < b.headerText) ? -1 : 1)
+              return a.headerText === b.headerText
+                ? 0
+                : a.headerText < b.headerText
+                  ? -1
+                  : 1
             } else {
               return -1
             }
           }
           if (a.sortKey === b.sortKey) {
             // Tie-break by header text
-            return (a.headerText === b.headerText) ? 0 : ((a.headerText < b.headerText) ? -1 : 1)
+            return a.headerText === b.headerText
+              ? 0
+              : a.headerText < b.headerText
+                ? -1
+                : 1
           } else {
-            return (a.sortKey < b.sortKey) ? -plusOne : plusOne
+            return a.sortKey < b.sortKey ? -plusOne : plusOne
           }
         })
     },
@@ -261,9 +327,9 @@ export default {
       return result.sort((a, b) => {
         if (a[sortKey] === b[sortKey]) {
           // Tie-break by name
-          return (a.name === b.name) ? 0 : ((a.name < b.name) ? -1 : 1)
+          return a.name === b.name ? 0 : a.name < b.name ? -1 : 1
         } else {
-          return (a[sortKey] < b[sortKey]) ? -plusOne : plusOne
+          return a[sortKey] < b[sortKey] ? -plusOne : plusOne
         }
       })
     },
@@ -294,7 +360,8 @@ export default {
               // Just load the next page
               if (data.length > 0) {
                 this.dbItems.push({
-                  headerText: (this.appPage === 1) ? undefined : `Page ${this.appPage}`,
+                  headerText:
+                    this.appPage === 1 ? undefined : `Page ${this.appPage}`,
                   items: data
                 })
                 this.enableAutoPager()
@@ -304,13 +371,16 @@ export default {
               const items = []
               const pages = Math.ceil(data.length / this.appItemsPerPage)
               for (let i = 0; i < pages; i++) {
-                const pageItems = data.slice(i * this.appItemsPerPage, (i + 1) * this.appItemsPerPage)
+                const pageItems = data.slice(
+                  i * this.appItemsPerPage,
+                  (i + 1) * this.appItemsPerPage
+                )
                 if (pageItems.length === 0) {
                   this.appSetPage(i + 1)
                   break
                 }
                 items.push({
-                  headerText: (i === 0) ? undefined : `Page ${i + 1}`,
+                  headerText: i === 0 ? undefined : `Page ${i + 1}`,
                   items: pageItems
                 })
               }

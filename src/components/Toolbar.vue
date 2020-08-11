@@ -76,9 +76,6 @@ export default {
       searchText: ''
     }
   },
-  created () {
-    this.searchText = this.appSearchSpec
-  },
   computed: {
     ...mapGetters({
       appMode: 'app/getMode',
@@ -91,6 +88,9 @@ export default {
     parts () {
       return (this.appPath === '') ? [] : this.appPath.split('/')
     }
+  },
+  created () {
+    this.searchText = this.appSearchSpec
   },
   methods: {
     ...mapActions({
