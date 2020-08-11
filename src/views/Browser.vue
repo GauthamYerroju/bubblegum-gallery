@@ -19,7 +19,7 @@
       )
       div.end-marker(
         ref="endMarker"
-      ) End Marker
+      ) ...that's it.
 </template>
 
 <script>
@@ -470,5 +470,9 @@ export default {
 .loading-overlay {
   z-index: 100;
   background: rgba(0, 0, 0, 0.5);
+}
+.end-marker {
+  color: rgba(127, 127, 127, 0.25);
+  text-align: center;
 }
 </style>
