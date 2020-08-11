@@ -21,10 +21,10 @@
               v-model="searchText"
               @keydown.enter="appSetSearchSpec(searchText)"
             )
-          nav.level.breadcrumb.has-succeeds-separator(aria-label="breadcrumbs" v-if="appMode === 'path'")
+          nav.level.breadcrumb(aria-label="breadcrumbs" v-if="appMode === 'path'")
             ul
               li(@click="setPath(-1)")
-                a.is-paddingless(aria-label="Go home")
+                a(aria-label="Go home")
                   fa-icon(icon="home" title="Home" aria-hidden="true")
               li(
                 v-for="(part, i) in parts"
