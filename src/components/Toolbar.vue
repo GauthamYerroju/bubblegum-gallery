@@ -10,12 +10,10 @@
         .navbar-start
           .navbar-item
             .buttons.has-addons
-              a.button.is-dark(@click="appSetModeToSearch" :class="{'is-info': appMode === 'search'}")
-                span.icon
-                  i.fas.fa-database
-              a.button.is-dark(@click="appSetModeToPath" :class="{'is-info': appMode === 'path'}")
-                span.icon
-                  i.fas.fa-folder
+              a.button.is-dark(aria-label="Switch to database view" @click="appSetModeToSearch" :class="{'is-info': appMode === 'search'}")
+                fa-icon(icon="database" aria-hidden="true" title="Database view")
+              a.button.is-dark(aria-label="Switch to folder view" @click="appSetModeToPath" :class="{'is-info': appMode === 'path'}")
+                fa-icon(icon="folder" aria-hidden="true" title="Folder view")
           .navbar-item(v-if="appMode === 'search'")
             input.input(
               type="text"
@@ -26,9 +24,8 @@
           nav.level.breadcrumb.has-succeeds-separator(aria-label="breadcrumbs" v-if="appMode === 'path'")
             ul
               li(@click="setPath(-1)")
-                a.is-paddingless
-                  span.icon
-                    i.fas.fa-home(aria-hidden="true")
+                a.is-paddingless(aria-label="Go home")
+                  fa-icon(icon="home" title="Home" aria-hidden="true")
               li(
                 v-for="(part, i) in parts"
                 :key="i"
@@ -39,30 +36,23 @@
         .navbar-end
           .navbar-item
             .buttons.has-addons
-              a.button.is-dark(@click="appSetSortBy('name')" :class="{'is-info': appSortBy === 'name'}")
-                span.icon
-                  i.fas.fa-font
-              a.button.is-dark(@click="appSetSortBy('mtime')" :class="{'is-info': appSortBy === 'mtime'}")
-                span.icon
-                  i.fas.fa-clock
-              a.button.is-dark(@click="appSetSortBy('type')" :class="{'is-info': appSortBy === 'type'}")
-                span.icon
-                  i.fas.fa-shapes
-              a.button.is-dark(@click="appSetSortBy('size')" :class="{'is-info': appSortBy === 'size'}")
-                span.icon
-                  i.fas.fa-chart-bar
+              a.button.is-dark(aria-label="Sort by name" @click="appSetSortBy('name')" :class="{'is-info': appSortBy === 'name'}")
+                fa-icon(aria-hidden="true" title="Sort by name" icon="font")
+              a.button.is-dark(aria-label="Sort by date" @click="appSetSortBy('mtime')" :class="{'is-info': appSortBy === 'mtime'}")
+                fa-icon(aria-hidden="true" title="Sort by date" icon="clock")
+              a.button.is-dark(aria-label="Sort by type" @click="appSetSortBy('type')" :class="{'is-info': appSortBy === 'type'}")
+                fa-icon(aria-hidden="true" title="Sort by type" icon="shapes")
+              a.button.is-dark(aria-label="Sort by size" @click="appSetSortBy('size')" :class="{'is-info': appSortBy === 'size'}")
+                fa-icon(aria-hidden="true" title="Sort by size" icon="chart-bar")
           .navbar-item
-            a.button.is-dark(@click="appSetSortAsc(!appSortAsc)")
-              span.icon
-                i.fas(:class="`fa-sort-amount-down${appSortAsc ? '-alt' : ''}`")
+            a.button.is-dark(aria-label="Toggle sort order" @click="appSetSortAsc(!appSortAsc)")
+              fa-icon(aria-hidden="true" title="Toggle sort order" :icon="`sort-amount-down${appSortAsc ? '-alt' : ''}`")
           .navbar-item
-            a.button.is-dark(@click="appSetSegment(!appSegment)" :class="{'is-info': appSegment}")
-              span.icon
-                i.fas.fa-list-ul
+            a.button.is-dark(aria-label="Group items" @click="appSetSegment(!appSegment)" :class="{'is-info': appSegment}")
+              fa-icon(aria-hidden="true" title="Group items" icon="list-ul")
           .navbar-item
-            a.button.is-dark(@click="goToSettings")
-              span.icon
-                i.fas.fa-cog
+            a.button.is-dark(aria-label="Open Settings" @click="goToSettings")
+              fa-icon(aria-hidden="true" title="Settings" icon="cog")
 </template>
 
 <script>
