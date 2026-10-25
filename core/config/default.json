@@ -1,0 +1,20 @@
+{
+    "fs": {
+        "defaultDir": "test_media",
+        "recurse": false
+    },
+    "thumbnail": {
+        "dir": "thumbnails",
+        "size": 400
+    },
+    "statKeys": {
+        "size": "size",
+        "mtime": "mtimeMs",
+        "ctime": "ctimeMs"
+    },
+    "db": {
+        "file": "data.db",
+        "wal": true,
+        "verbose": true
+    }
+}

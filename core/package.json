@@ -1,0 +1,33 @@
+{
+  "name": "bubblegum-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx standard --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GauthamYerroju/bubblegum-core.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GauthamYerroju/bubblegum-core/issues"
+  },
+  "homepage": "https://github.com/GauthamYerroju/bubblegum-core#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.1.0",
+    "config": "^3.3.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "mime-types": "^2.1.27",
+    "xxhash": "^0.3.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "standard": "^14.3.4"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  }
+}
