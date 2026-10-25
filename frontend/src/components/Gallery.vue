@@ -1,7 +1,18 @@
 <template lang="pug">
   div.gallery(v-if="currentItem" @click="close" @contextmenu="oncontextmenu" @wheel="onwheel")
     div
-      img.gallery-media(:src="currentItem.src" :style="zoomCss")
+      //- click.stop: using the video controls shouldn't close the viewer
+      video.gallery-media(
+        v-if="isVideo"
+        :key="currentItem.key"
+        :src="currentItem.src"
+        :style="zoomCss"
+        controls
+        autoplay
+        loop
+        @click.stop
+      )
+      img.gallery-media(v-else :src="currentItem.src" :style="zoomCss")
     //- div.gallery-thumbnails
       div.gallery-thumb(
           v-for="item in items"
@@ -15,6 +26,9 @@
 <script>
 import { mapState } from 'pinia'
 import { useSourcesStore } from '@/stores/sources'
+
+// Same video types core makes thumbnails for (media/video.js)
+const videoExtensions = ['.avi', '.mp4', '.webm', '.mkv', '.flv']
 
 export default {
   name: 'Gallery',
@@ -43,6 +57,12 @@ export default {
     currentItem () {
       const item = this.items[this.currentIndex]
       return item ? { ...item, src: this.urlGetFile(item.path) } : null
+    },
+    isVideo () {
+      // Folder listings carry a mime type; search results only have the extension (type)
+      const item = this.currentItem
+      if (item.mime) return item.mime.startsWith('video/')
+      return videoExtensions.includes((item.ext || item.type || '').toLowerCase())
     },
     zoomCss () {
       return `transform: scale3d(${this.zoomScale}, ${this.zoomScale}, 1);`
