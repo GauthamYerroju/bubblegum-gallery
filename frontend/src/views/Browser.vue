@@ -36,6 +36,9 @@ import Sidebar from '@/components/Sidebar.vue'
 import Gallery from '@/components/Gallery.vue'
 import ItemContainer from '@/components/ItemContainer.vue'
 
+const KB = 1024
+const MB = 1024 * KB
+
 export default {
   name: 'Browser',
   components: {
@@ -124,8 +127,15 @@ export default {
         },
         other: { name: 'Other', sortIndex: 12 }
       },
+      // File size buckets, each about 5x the last (sizes span several orders of magnitude)
       sizes: {
-        tiny: { name: 'Tiny', sortIndex: 1, is: size => true }
+        tiny: { name: 'Tiny (under 100 KB)', sortIndex: 1, is: size => size < 100 * KB },
+        small: { name: 'Small (100 KB – 500 KB)', sortIndex: 2, is: size => size < 500 * KB },
+        medium: { name: 'Medium (500 KB – 2 MB)', sortIndex: 3, is: size => size < 2 * MB },
+        large: { name: 'Large (2 MB – 10 MB)', sortIndex: 4, is: size => size < 10 * MB },
+        huge: { name: 'Huge (10 MB – 100 MB)', sortIndex: 5, is: size => size < 100 * MB },
+        massive: { name: 'Massive (over 100 MB)', sortIndex: 6, is: size => size >= 100 * MB },
+        other: { name: 'Other', sortIndex: 7 }
       }
     }
   },
@@ -245,6 +255,7 @@ export default {
           const mtime = DateTime.fromMillis(parseFloat(item.mtime))
           return findKey(intervals, i => i.is && i.is(now, mtime)) || 'other'
         } else if (groupKey === 'size') {
+          if (item.dir) return 'Folder' // folders report size 0; keep them out of "Tiny"
           const size = parseInt(item.size)
           return findKey(sizes, s => s.is && s.is(size)) || 'other'
         } else if (groupKey === 'type') {
@@ -254,8 +265,7 @@ export default {
       })
       return Object.entries(rawGroups)
         .map(([key, items]) => {
-           
-          let sortKey = "";
+          let sortKey = ''
           let headerText = ''
           if (key === 'dont-group') {
             sortKey = undefined
@@ -263,7 +273,7 @@ export default {
           } else if (groupKey === 'mtime') {
             sortKey = intervals[key].sortIndex
             headerText = intervals[key].name
-          } else if (groupKey === 'size') {
+          } else if (groupKey === 'size' && key !== 'Folder') {
             sortKey = sizes[key].sortIndex
             headerText = sizes[key].name
           } else {
