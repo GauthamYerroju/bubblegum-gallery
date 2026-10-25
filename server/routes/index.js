@@ -49,7 +49,9 @@ router.get('/', function (req, res, next) {
 router.get('/get-file', function (req, res, next) {
   var p = resolveInside(argv.home, req.query.path)
   if (!p) return next(createError(403))
-  return res.sendFile(p)
+  // sendFile 404s any path with a dot-segment by default; listdir shows dot-folders, so serve them
+  // (resolveInside already keeps the path inside the media folder)
+  return res.sendFile(p, { dotfiles: 'allow' })
 });
 
 router.get('/get-thumbnail', function (req, res, next) {
