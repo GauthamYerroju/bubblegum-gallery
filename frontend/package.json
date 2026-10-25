@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve --port 8080",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build",
-    "lint": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service lint"
+    "dev": "vite",
+    "serve": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
@@ -13,52 +14,18 @@
     "@fortawesome/vue-fontawesome": "^0.1.10",
     "axios": "^0.19.2",
     "bulma": "^0.9.0",
-    "core-js": "^3.6.5",
     "lodash": "^4.17.19",
     "luxon": "^1.24.1",
     "slugify": "^1.4.5",
     "vanilla-lazyload": "^17.1.0",
-    "vue": "^2.6.11",
+    "vue": "~2.7.16",
     "vue-router": "^3.4.2",
     "vuex": "^3.5.1"
   },
+  "type": "module",
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.14",
-    "@vue/cli-plugin-eslint": "^4.5.2",
-    "@vue/cli-service": "~4.5.14",
-    "@vue/eslint-config-standard": "^5.1.2",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.6.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-cli-plugin-pug": "~2.0.0",
-    "vue-template-compiler": "^2.6.11",
-    "cross-env": "^10.1.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/recommended",
-      "@vue/standard"
-    ],
-    "rules": {},
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ]
+    "@vitejs/plugin-vue2": "^2.3.4",
+    "pug": "^3.0.4",
+    "vite": "^7.3.7"
+  }
 }

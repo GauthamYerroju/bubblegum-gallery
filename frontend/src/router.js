@@ -6,7 +6,7 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
-  base: process.env.BASE_URL,
+  base: import.meta.env.BASE_URL,
   routes: [
     {
       path: '/',
@@ -20,7 +20,7 @@ export default new Router({
       // this generates a separate chunk (settings.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () =>
-        import(/* webpackChunkName: "settings" */ './views/Settings.vue')
+        import('./views/Settings.vue')
     }
   ]
 })

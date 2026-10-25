@@ -24,7 +24,6 @@
 
 <script>
 // @ is an alias to /src
-import pathlib from 'path'
 import slugify from 'slugify'
 import LazyLoad from 'vanilla-lazyload'
 import { groupBy, findKey } from 'lodash'
@@ -442,7 +441,7 @@ export default {
       }
     },
     __openDir (item) {
-      const newPath = pathlib.join(this.path, item.name)
+      const newPath = this.path ? `${this.path}/${item.name}` : item.name
       this.appSetPath(newPath)
     },
     __openFile (item) {

@@ -1,7 +1,11 @@
 import keys from 'lodash/keys'
 import union from 'lodash/union'
 import snakeCase from 'lodash/snakeCase'
-import { stringify } from 'querystring'
+
+// Same output as Node's querystring.stringify for flat objects (null/undefined become empty)
+const stringify = query => new URLSearchParams(
+  Object.entries(query).map(([k, v]) => [k, v === null || v === undefined ? '' : String(v)])
+).toString()
 
 // Thanks for this: https://stackoverflow.com/questions/44171210/what-is-vuex-router-sync-for
 

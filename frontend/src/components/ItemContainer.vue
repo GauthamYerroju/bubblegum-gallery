@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Item from '@/components/Item'
+import Item from '@/components/Item.vue'
 
 export default {
   name: 'ItemContainer',
