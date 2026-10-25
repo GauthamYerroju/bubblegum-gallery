@@ -8,7 +8,7 @@
     "frontend"
   ],
   "scripts": {
-    "dev": "concurrently -k -P -n server,frontend -c blue,green \"npm -w server start -- {@}\" \"npm -w frontend run serve\" --",
+    "dev": "node scripts/dev.js",
     "start": "npm run dev --",
     "sample": "node scripts/make-sample.js",
     "build": "npm -w frontend run build"

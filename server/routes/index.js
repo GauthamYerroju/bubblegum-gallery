@@ -27,6 +27,11 @@ for (var [i, spec] of Object.entries(argSpec)) {
   argv[spec.name] = path.resolve(process.argv[1 + Number(i)] || process.env[spec.env] || spec.default)
 }
 console.table(argv)
+// Fail fast on a wrong media folder instead of serving an empty gallery
+if (!require('fs').statSync(argv.home, { throwIfNoEntry: false })?.isDirectory()) {
+  console.error(`Media folder not found: ${argv.home}`)
+  process.exit(1)
+}
 
 // Resolves a client-supplied path against root; null if it points outside root
 function resolveInside (root, p) {
