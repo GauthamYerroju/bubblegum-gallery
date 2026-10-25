@@ -1,11 +1,11 @@
 {
-  "name": "bubblegum-gallery",
+  "name": "bubblegum-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "node --openssl-legacy-provider node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
-    "build": "node --openssl-legacy-provider node_modules/@vue/cli-service/bin/vue-cli-service.js build",
-    "lint": "node --openssl-legacy-provider node_modules/@vue/cli-service/bin/vue-cli-service.js lint"
+    "serve": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve --port 8080",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build",
+    "lint": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service lint"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
@@ -35,7 +35,8 @@
     "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-vue": "^6.2.2",
     "vue-cli-plugin-pug": "~2.0.0",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "cross-env": "^10.1.0"
   },
   "eslintConfig": {
     "root": true,

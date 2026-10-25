@@ -8,23 +8,22 @@ var { iterDir, getFileData, getFileDataBatch, searchDb } = require("bubblegum-co
 // TODO: why do I need config/default.json? Figure it out.
 // TODO: define settings in bubblegum-core, expose it in bubblegum-server and bubblegum-gallery
 
-// Commandline args (quick and dirty argparser)
+// Commandline args (quick and dirty argparser), falling back to env vars, then defaults
 var argSpec = {
   1: {
     name: 'home',
-    default: process.cwd()
+    env: 'BUBBLEGUM_MEDIA',
+    default: path.resolve(__dirname, '../../sample-media')
   },
   2: {
     name: 'thumbs',
+    env: 'BUBBLEGUM_THUMBS',
     default: path.resolve(process.cwd(), 'thumbnails')
   }
 }
 var argv = {}
-for (var [i, arg] of process.argv.slice(2).entries()) {
-  var spec = argSpec[i + 1]
-  if (spec) {
-    argv[spec.name] = arg || spec.default
-  }
+for (var [i, spec] of Object.entries(argSpec)) {
+  argv[spec.name] = path.resolve(process.argv[1 + Number(i)] || process.env[spec.env] || spec.default)
 }
 console.table(argv)
 
