@@ -17,9 +17,11 @@ class ImageHandler extends DefaultHandler {
 
   static saveThumbnail (file, dest) {
     // Fit inside a size x size box, keeping aspect ratio. Animated GIFs stay animated
-    // (dest ends in .gif for them); everything else is written as PNG to keep transparency.
+    // (dest ends in .gif for them); everything else is written as PNG to keep transparency,
+    // from the first frame only: PNG can't animate, and reading all frames of an animated WebP
+    // or multi-page TIFF into a PNG stacks them into one tall strip.
     const size = config.get('thumbnail.size')
-    return sharp(file, { animated: true })
+    return sharp(file, { animated: dest.endsWith('.gif') })
       .resize(size, size, { fit: 'inside' })
       .toFile(dest)
       .then(() => dest)
