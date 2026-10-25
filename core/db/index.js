@@ -2,6 +2,8 @@ const config = require('config')
 const { DatabaseSync } = require('node:sqlite')
 const query = require('./query.js')
 
+const sortColumns = ['name', 'mtime', 'type', 'size', 'width', 'height']
+
 // NOTE: Relying on IIFE for singleton behavior (multiple imports, one connection)
 const instance = (() => {
   // Connect to database
@@ -30,15 +32,18 @@ const instance = (() => {
     // Why? "ORDER BY col_name" doesn't work in db.prepare() because it becomes "ORDER BY 'col_name'".
     st._cache = {}
     st.search = (orderby, desc, limit, offset) => {
+      // orderby is spliced into the SQL, so only real columns are allowed (it comes from the URL)
+      if (!sortColumns.includes(orderby)) orderby = 'name'
       // Limit and offset values don't matter, just whether they exist or not
       const key = [orderby, desc, (limit !== undefined), (offset !== undefined)]
       if (!(st._cache[key])) {
         let stmt = 'SELECT * FROM file_info WHERE name LIKE @name'
-        if (orderby) stmt = `${stmt} ORDER BY ${orderby}`
+        stmt = `${stmt} ORDER BY ${orderby}`
         if (desc) stmt = `${stmt} DESC`
         stmt = `${stmt}, name`
-        if (limit) stmt = `${stmt} LIMIT @limit`
-        if (offset) stmt = `${stmt} offset @offset`
+        // Same tests as the cache key, so a cached statement always has the clauses its key says
+        if (limit !== undefined) stmt = `${stmt} LIMIT @limit`
+        if (offset !== undefined) stmt = `${stmt} OFFSET @offset`
         stmt = `${stmt};`
         st._cache[key] = prepare(stmt)
         console.warn('!!! Statement prepared for:', key)

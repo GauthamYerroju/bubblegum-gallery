@@ -202,8 +202,9 @@ function importFile (item, resolveAfterInsert) {
 function createThumb (item) {
   const thumb = db.getThumb(item.xxhash)
   if (thumb) {
-    item = Object.assign(item, { thumb: thumb.path })
-    return Promise.resolve(item)
+    // Same content seen before (a duplicate, or a file whose mtime changed): reuse its thumbnail.
+    // Resolves with the path like the branch below; callers store it as item.thumb.
+    return Promise.resolve(thumb.path)
   }
   const mtype = mime.lookup(item.path)
   const isGif = mtype.startsWith('video') || mtype === 'image/gif'
@@ -239,12 +240,15 @@ function searchDb (name, orderby = 'name', desc = false, limit, offset) {
           }
         } else {
           if (info.mtimeMs !== row.mtime) {
+            // Changed on disk: re-import with the current stats (keeping the old mtime
+            // would make the new entry look stale on every search)
             cleanMissingFile(row)
-            getFileData(row)
+            getFileData({ ...row, ext: row.type, mtime: info.mtimeMs, size: info.size })
               .catch(reject)
               .then(resolve)
           } else {
-            resolve(row)
+            const thumb = db.getThumb(row.xxhash)
+            resolve(thumb ? { ...row, thumb: thumb.path } : row)
           }
         }
       })

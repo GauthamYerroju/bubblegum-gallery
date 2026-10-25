@@ -67,7 +67,7 @@ router.get('/listdir', function (req, res, next) {
     })
     .catch(err => {
       console.error(err)
-      res.json(err)
+      res.status(500).json({ message: String(err && err.message || err) })
     })
 });
 
@@ -83,7 +83,7 @@ router.get('/search', function (req, res, next) {
     })
     .catch(err => {
       console.error(err)
-      res.json(err)
+      res.status(500).json({ message: String(err && err.message || err) })
     })
 });
 
@@ -101,19 +101,15 @@ router.get('/scan', function (req, res, next) {
   const recursivePromise = (iterator) => {
     const batch = fillBatch(iterator)
     return getFileDataBatch(batch, true)
-      .catch(err => {
-        console.error(err)
-        res.status(500).json(err)
-      })
-      .then((result) => {
-        if (batch.length) {
-          return recursivePromise(iterator)
-        } else {
-          return res.json({ message: `Indexing succesful.` })
-        }
-      })
+      .then(() => batch.length ? recursivePromise(iterator) : null)
   }
+  // One response at the end: an error stops the scan instead of answering and carrying on
   recursivePromise(iterDir(path.resolve(argv.home), true))
+    .then(() => res.json({ message: 'Indexing succesful.' }))
+    .catch(err => {
+      console.error(err)
+      res.status(500).json({ message: String(err && err.message || err) })
+    })
 });
 
 module.exports = router;
