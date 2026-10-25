@@ -7,7 +7,7 @@
       v-if="appGalleryKey && !loading"
       :items="galleryItems"
       :currentKey="appGalleryKey"
-      @keyChange="appSetGalleryKey"
+      @keyChange="appGalleryKey = $event"
     )
     div(ref="lazyloadcontainer").scroll-container.full-height
       ItemContainer(
@@ -28,7 +28,9 @@ import slugify from 'slugify'
 import LazyLoad from 'vanilla-lazyload'
 import { groupBy, findKey } from 'lodash'
 import { DateTime, Interval } from 'luxon'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapWritableState } from 'pinia'
+import { useAppStore } from '@/stores/app'
+import { useApiStore } from '@/stores/api'
 import Toolbar from '@/components/Toolbar.vue'
 import Sidebar from '@/components/Sidebar.vue'
 import Gallery from '@/components/Gallery.vue'
@@ -128,17 +130,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      appMode: 'app/getMode',
-      appPath: 'app/getPath',
-      appSearchSpec: 'app/getSearchSpec',
-      appSortBy: 'app/getSortBy',
-      appSortAsc: 'app/getSortAsc',
-      appPage: 'app/getPage',
-      appSkipPages: 'app/getSkipPages',
-      appItemsPerPage: 'app/getItemsPerPage',
-      appSegment: 'app/getSegment',
-      appGalleryKey: 'app/getGalleryKey'
+    ...mapWritableState(useAppStore, {
+      appMode: 'mode',
+      appPath: 'path',
+      appSearchSpec: 'searchSpec',
+      appSortBy: 'sortBy',
+      appSortAsc: 'sortAsc',
+      appPage: 'page',
+      appSkipPages: 'skipPages',
+      appItemsPerPage: 'itemsPerPage',
+      appSegment: 'segment',
+      appGalleryKey: 'galleryKey'
     }),
     renderGroups () {
       if (this.appMode === 'search') {
@@ -177,30 +179,30 @@ export default {
           this.path = currentPath
         })
         .catch(err => {
-          this.appSetPath(this.path)
+          this.appPath = this.path
           this.handleError(err)
         })
     },
     appSearchSpec (newSpec, oldSpec) {
-      this.appSetPage(1)
+      this.appPage = 1
       this.getSearchItems(newSpec)
         .then(currentSearchSpec => {
           this.searchSpec = currentSearchSpec
         })
         .catch(err => {
-          this.appSetSearchSpec(this.searchSpec)
+          this.appSearchSpec = this.searchSpec
           this.handleError(err)
         })
     },
     appSortBy (newVal, oldVal) {
       if (this.appMode === 'search') {
-        this.appSetPage(1)
+        this.appPage = 1
         this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     },
     appSortAsc (newVal, oldVal) {
       if (this.appMode === 'search') {
-        this.appSetPage(1)
+        this.appPage = 1
         this.getSearchItems(this.searchSpec).catch(this.handleError)
       }
     }
@@ -216,7 +218,7 @@ export default {
       }
     })
     window.addEventListener('keydown', this.onkey)
-    this.appSetPage(1)
+    this.appPage = 1
     this.loadDefaultItems()
   },
   beforeUnmount: function () {
@@ -224,16 +226,9 @@ export default {
     this.observer.disconnect()
   },
   methods: {
-    ...mapActions({
-      appSetPath: 'app/setPath',
-      appSetSearchSpec: 'app/setSearchSpec',
-      appSetPage: 'app/setPage',
-      appSetSkipPages: 'app/setSkipPages',
-      appSetModeToPath: 'app/setModeToPath',
-      appSetModeToSearch: 'app/setModeToSearch',
-      appSetGalleryKey: 'app/setGalleryKey',
-      apiGetPathItems: 'api/getPathItems',
-      apiGetSearchItems: 'api/getSearchItems'
+    ...mapActions(useApiStore, {
+      apiGetPathItems: 'getPathItems',
+      apiGetSearchItems: 'getSearchItems'
     }),
     enableAutoPager () {
       this.observer.observe(this.$refs.endMarker)
@@ -377,7 +372,7 @@ export default {
                   (i + 1) * this.appItemsPerPage
                 )
                 if (pageItems.length === 0) {
-                  this.appSetPage(i + 1)
+                  this.appPage = i + 1
                   break
                 }
                 items.push({
@@ -406,25 +401,25 @@ export default {
         this.getPathItems(this.appPath)
           .then(currentPath => {
             this.path = currentPath
-            this.appSetPath(this.path)
+            this.appPath = this.path
           })
           .catch(this.handleError)
       } else {
         this.getSearchItems(this.appSearchSpec)
           .then(currentSearchSpec => {
             this.searchSpec = currentSearchSpec
-            this.appSetSearchSpec(this.searchSpec)
+            this.appSearchSpec = this.searchSpec
           })
           .catch(this.handleError)
       }
     },
     loadNextPage () {
-      this.appSetSkipPages(this.appPage)
-      this.appSetPage(this.appPage + 1)
+      this.appSkipPages = this.appPage
+      this.appPage = this.appPage + 1
       this.getSearchItems(this.searchSpec)
         .catch(this.handleError)
         .finally(() => {
-          this.appSetSkipPages(0)
+          this.appSkipPages = 0
         })
     },
     openItem (item) {
@@ -443,10 +438,10 @@ export default {
     },
     __openDir (item) {
       const newPath = this.path ? `${this.path}/${item.name}` : item.name
-      this.appSetPath(newPath)
+      this.appPath = newPath
     },
     __openFile (item) {
-      this.appSetGalleryKey(item.key)
+      this.appGalleryKey = item.key
     },
     onkey (ev) {
       if (this.appMode === 'search' && ev.altKey && ev.code === 'KeyF') {

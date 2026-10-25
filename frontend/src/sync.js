@@ -1,53 +1,64 @@
-import keys from 'lodash/keys'
-import union from 'lodash/union'
-import snakeCase from 'lodash/snakeCase'
+import { watch } from 'vue'
+import { useAppStore } from './stores/app'
+
+// Two-way sync between the app store and the URL query.
+// Thanks for the idea: https://stackoverflow.com/questions/44171210/what-is-vuex-router-sync-for
+
+// Keys mirrored in the URL, with how to read them back from a query string value
+const urlKeys = {
+  mode: v => v,
+  path: v => v,
+  searchSpec: v => v,
+  page: v => Number(v),
+  sortBy: v => v,
+  sortAsc: v => v !== 'false',
+  galleryKey: v => v || null
+}
+// Changing these adds a history entry; other changes replace the current one
+const pushTriggers = ['mode', 'path', 'searchSpec']
 
 // Same output as Node's querystring.stringify for flat objects (null/undefined become empty)
 const stringify = query => new URLSearchParams(
   Object.entries(query).map(([k, v]) => [k, v === null || v === undefined ? '' : String(v)])
 ).toString()
 
-// Thanks for this: https://stackoverflow.com/questions/44171210/what-is-vuex-router-sync-for
+export default (pinia, router) => {
+  const app = useAppStore(pinia)
+  const defaults = { ...app.$state } // state before the URL is applied
 
-export default (store, router) => {
   // react to store and update route
-  store.watch(
-    state => {
-      const { mode, path, searchSpec, page, sortBy, sortAsc, galleryKey } = state.app
-      return { mode, path, searchSpec, page, sortBy, sortAsc, galleryKey }
-    },
+  watch(
+    () => Object.fromEntries(Object.keys(urlKeys).map(key => [key, app[key]])),
     watched => {
       const oldQuery = router.currentRoute.value.query
-      const existTriggers = 'galleryKey'.split(', ')
-      const replaceTriggers = 'mode, path, searchSpec'.split(', ')
       if (stringify(oldQuery) !== stringify(watched)) {
-        let push = replaceTriggers.some(trigger => oldQuery[trigger] !== watched[trigger])
+        let push = pushTriggers.some(key => oldQuery[key] !== watched[key])
         if (!push) {
-          push = existTriggers.some(trigger => oldQuery[trigger] === null && watched[trigger] !== null)
+          // Opening the viewer is a history entry too, so Back closes it
+          push = oldQuery.galleryKey === null && watched.galleryKey !== null
         }
-        if (push) {
-          router.push({ query: watched })
-        } else {
-          router.replace({ query: watched })
-        }
+        const query = Object.fromEntries(
+          Object.entries(watched).map(([k, v]) => [k, v === null ? null : String(v)])
+        )
+        router[push ? 'push' : 'replace']({ query })
       }
     }
   )
+
   // react to route and update store
-  router.afterEach((to, from) => {
-    const qTo = to.query
-    const qFrom = from.query
-    if (stringify(qTo) !== stringify(qFrom)) {
-      const diff = {}
-      const kAll = union(keys(qTo), keys(qFrom))
-      for (const key of kAll) {
-        diff[key] = qTo[key]
+  router.afterEach((to, from, failure) => {
+    // afterEach also runs for navigations that were cancelled by a newer one; applying those
+    // would write stale values back to the store and start a store <-> URL ping-pong
+    if (failure) return
+    if (stringify(to.query) !== stringify(from.query)) {
+      // Only keys the URL has, or just lost; a key that was never in the URL keeps its store value
+      const values = {}
+      for (const [key, parse] of Object.entries(urlKeys)) {
+        if (!(key in to.query) && !(key in from.query)) continue
+        const v = to.query[key]
+        values[key] = (v === undefined || v === null) ? defaults[key] : parse(v)
       }
-      for (const key in diff) {
-        // TODO: This is hacky and relies on naming conventions. I can do better.
-        const mutation = `app/SET_${snakeCase(key).toUpperCase()}`
-        store.commit(mutation, diff[key])
-      }
+      app.$patch(values)
     }
   })
 }

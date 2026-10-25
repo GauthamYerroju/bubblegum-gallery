@@ -3,7 +3,7 @@
     HeaderBar(name="Settings")
     h1.title Settings
     p
-      | Settings go here. Use Vuex to centralize the settings object, load it from env/file/defaults
+      | Settings go here. Use Pinia to centralize the settings object, load it from env/file/defaults
     p
       button.button.is-info(@click="callIndex") Scan Folder
     About
@@ -11,7 +11,8 @@
 
 <script>
 // @ is an alias to /src
-import { mapActions } from 'vuex'
+import { mapActions } from 'pinia'
+import { useApiStore } from '@/stores/api'
 import HeaderBar from '@/components/HeaderBar.vue'
 import About from '@/components/About.vue'
 
@@ -22,8 +23,8 @@ export default {
     About
   },
   methods: {
-    ...mapActions({
-      apiDoScan: 'api/doScan'
+    ...mapActions(useApiStore, {
+      apiDoScan: 'doScan'
     }),
     callIndex () {
       this.apiDoScan()

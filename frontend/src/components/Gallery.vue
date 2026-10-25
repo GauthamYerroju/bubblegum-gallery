@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useSourcesStore } from '@/stores/sources'
 
 export default {
   name: 'Gallery',
@@ -35,7 +36,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('sources', ['urlGetFile']),
+    ...mapState(useSourcesStore, ['urlGetFile']),
     currentIndex () {
       return this.items.findIndex((x) => x.key === this.currentKey)
     },

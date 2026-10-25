@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
-import store from './store'
 import router from './router'
 import sync from './sync'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -9,10 +9,11 @@ import { faDatabase, faFolder, faHome, faFont, faClock, faShapes, faChartBar, fa
 
 library.add(faDatabase, faFolder, faHome, faFont, faClock, faShapes, faChartBar, faSortAmountDown, faSortAmountDownAlt, faListUl, faCog)
 
-sync(store, router)
+const pinia = createPinia()
+sync(pinia, router)
 
 createApp(App)
+  .use(pinia)
   .use(router)
-  .use(store)
   .component('fa-icon', FontAwesomeIcon)
   .mount('#app')

@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useSourcesStore } from '@/stores/sources'
 
 export default {
   name: 'Item',
@@ -25,7 +26,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('sources', ['urlGetFile', 'urlGetThumbnail']),
+    ...mapState(useSourcesStore, ['urlGetFile', 'urlGetThumbnail']),
     renderItem () {
       const item = { ...this.item }
       if (item.thumb) {
