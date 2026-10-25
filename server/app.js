@@ -20,7 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(helmet())
+// The frontend runs on another origin and loads files/thumbnails from here with <img>
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 
 // TODO: ETag based on modigied time/hash for files
 
