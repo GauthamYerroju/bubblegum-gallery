@@ -3,6 +3,7 @@ var process = require('process')
 var express = require('express');
 var router = express.Router();
 var mime = require('mime-types')
+var createError = require('http-errors')
 var { iterDir, getFileData, getFileDataBatch, searchDb } = require("bubblegum-core")
 
 // TODO: why do I need config/default.json? Figure it out.
@@ -27,25 +28,36 @@ for (var [i, spec] of Object.entries(argSpec)) {
 }
 console.table(argv)
 
+// Resolves a client-supplied path against root; null if it points outside root
+function resolveInside (root, p) {
+  var full = path.resolve(root, p || '')
+  var rel = path.relative(root, full)
+  if (rel === '..' || rel.startsWith('..' + path.sep) || path.isAbsolute(rel)) return null
+  return full
+}
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
 router.get('/get-file', function (req, res, next) {
-  var p = path.resolve(argv.home, req.query.path)
+  var p = resolveInside(argv.home, req.query.path)
+  if (!p) return next(createError(403))
   return res.sendFile(p)
 });
 
 router.get('/get-thumbnail', function (req, res, next) {
-  var p = path.resolve(argv.thumbs, req.query.path)
+  var p = resolveInside(argv.thumbs, req.query.path)
+  if (!p) return next(createError(403))
   return res.sendFile(p)
 });
 
 router.get('/listdir', function (req, res, next) {
-  const homePath = path.resolve(argv.home, req.query.path || '')
+  const homePath = resolveInside(argv.home, req.query.path)
+  if (!homePath) return next(createError(403))
   const items = []
-  for (const i of iterDir(homePath, recurse = false)) {
+  for (const i of iterDir(homePath, false)) {
     i.mime = mime.lookup(i.path)
     items.push(i)
   }
@@ -101,7 +113,7 @@ router.get('/scan', function (req, res, next) {
         }
       })
   }
-  recursivePromise(iterDir(path.resolve(argv.home), recurse = true))
+  recursivePromise(iterDir(path.resolve(argv.home), true))
 });
 
 module.exports = router;
