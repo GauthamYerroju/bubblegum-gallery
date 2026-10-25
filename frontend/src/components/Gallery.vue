@@ -17,6 +17,7 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'Gallery',
+  emits: ['keyChange'],
   props: {
     currentKey: {
       type: String,
@@ -40,7 +41,7 @@ export default {
     },
     currentItem () {
       const item = this.items[this.currentIndex]
-      return Object.assign(item, { src: this.urlGetFile(item.path) })
+      return item ? { ...item, src: this.urlGetFile(item.path) } : null
     },
     zoomCss () {
       return `transform: scale3d(${this.zoomScale}, ${this.zoomScale}, 1);`
@@ -49,7 +50,7 @@ export default {
   created () {
     window.addEventListener('keydown', this.onkey)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     window.removeEventListener('keydown', this.onkey)
   },
   methods: {

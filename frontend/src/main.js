@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import store from './store'
 import router from './router'
@@ -8,14 +8,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faDatabase, faFolder, faHome, faFont, faClock, faShapes, faChartBar, faSortAmountDown, faSortAmountDownAlt, faListUl, faCog } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faDatabase, faFolder, faHome, faFont, faClock, faShapes, faChartBar, faSortAmountDown, faSortAmountDownAlt, faListUl, faCog)
-Vue.component('fa-icon', FontAwesomeIcon)
 
 sync(store, router)
 
-Vue.config.productionTip = false
-
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+createApp(App)
+  .use(router)
+  .use(store)
+  .component('fa-icon', FontAwesomeIcon)
+  .mount('#app')

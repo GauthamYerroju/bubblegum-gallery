@@ -143,10 +143,10 @@ export default {
     renderGroups () {
       if (this.appMode === 'search') {
         // DB mode: group by page
-        this.dbItems.forEach(group => {
-          group.items = this.postProcessItems(group.items)
-        })
-        return this.dbItems
+        return this.dbItems.map(group => ({
+          ...group,
+          items: this.postProcessItems(group.items)
+        }))
       } else {
         // Folder mode: group by sorting
         if (this.appSegment) {
@@ -219,7 +219,7 @@ export default {
     this.appSetPage(1)
     this.loadDefaultItems()
   },
-  beforeDestroy: function () {
+  beforeUnmount: function () {
     window.removeEventListener('keydown', this.onkey)
     this.observer.disconnect()
   },
@@ -308,10 +308,11 @@ export default {
         })
     },
     postProcessItems (items) {
-      const result = Array.from(items)
-      result.forEach((item, i) => {
-        item.key = slugify(`${item.name}-${item.mtime}-${item.xxhash}`)
-      })
+      // Copies, so computed properties never write to the reactive source items
+      const result = items.map(item => ({
+        ...item,
+        key: slugify(`${item.name}-${item.mtime}-${item.xxhash}`)
+      }))
       return this.sortItems(result)
     },
     sortItems (items) {

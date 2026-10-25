@@ -1,9 +1,6 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import axios from 'axios'
 import slugify from 'slugify'
-
-Vue.use(Vuex)
 
 const storeApp = {
   namespaced: true,
@@ -218,7 +215,7 @@ const storeApi = {
   }
 }
 
-export default new Vuex.Store({
+export default createStore({
   modules: {
     app: storeApp,
     api: storeApi,

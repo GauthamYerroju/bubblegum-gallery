@@ -17,7 +17,7 @@ export default (store, router) => {
       return { mode, path, searchSpec, page, sortBy, sortAsc, galleryKey }
     },
     watched => {
-      const oldQuery = router.history.current.query
+      const oldQuery = router.currentRoute.value.query
       const existTriggers = 'galleryKey'.split(', ')
       const replaceTriggers = 'mode, path, searchSpec'.split(', ')
       if (stringify(oldQuery) !== stringify(watched)) {

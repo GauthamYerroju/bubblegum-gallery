@@ -14,6 +14,7 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'Item',
+  emits: ['open'],
   props: {
     item: {
       type: Object,
@@ -26,7 +27,7 @@ export default {
   computed: {
     ...mapGetters('sources', ['urlGetFile', 'urlGetThumbnail']),
     renderItem () {
-      const item = this.item
+      const item = { ...this.item }
       if (item.thumb) {
         item.src = this.urlGetThumbnail(item.thumb)
       } else if (item.useSrc) {
