@@ -2,21 +2,23 @@ const fs = require('fs')
 const path = require('path')
 const mime = require('mime-types')
 const config = require('config')
-const xxhash = require('xxhash')
+const xxhash = require('xxhash-wasm')
 const { promisify } = require('util')
 const db = require('./db')
 const { Media } = require('./media')
 
+const xxhashReady = xxhash()
+
 function getHash (filename) {
-  var hasher = new xxhash.XXHash64(0xCAFEBABE)
-  return new Promise((resolve, reject) => {
+  return xxhashReady.then(({ create64 }) => new Promise((resolve, reject) => {
+    const hasher = create64(0xCAFEBABEn)
     fs.createReadStream(filename)
       .on('data', (data) => {
         hasher.update(data)
       })
-      .on('end', () => resolve(hasher.digest('hex')))
+      .on('end', () => resolve(hasher.digest().toString(16).padStart(16, '0')))
       .on('error', reject)
-  })
+  }))
   // return xxhash.hash64(data, 0xCAFEBABE, 'hex')
 }
 
@@ -113,7 +115,7 @@ function getFileDataBatch (items, resolveAfterInsert) {
   if (!dbFetchCount) {
     return Promise.resolve(items)
   }
-  const rows = db._db.transaction(() => items.map(item => (item.dir || item.error) ? item : db.getFileByPath(item.path)))()
+  const rows = items.map(item => (item.dir || item.error) ? item : db.getFileByPath(item.path))
   const promises = rows.map(function (row, i) {
     let item = items[i]
     if (item.dir || item.error) {

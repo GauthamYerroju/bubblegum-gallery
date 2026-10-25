@@ -1,23 +1,31 @@
-// NOTE: Batch statements in transaction: https://github.com/JoshuaWise/better-sqlite3/issues/125#issuecomment-395532558
 const config = require('config')
-const Database = require('better-sqlite3')
+const { DatabaseSync } = require('node:sqlite')
 const query = require('./query.js')
 
 // NOTE: Relying on IIFE for singleton behavior (multiple imports, one connection)
 const instance = (() => {
   // Connect to database
-  const options = {
-    verbose: config.get('db.verbose') ? console.log : undefined
-  }
-  const db = new Database(config.get('db.file'), options)
+  const db = new DatabaseSync(config.get('db.file'))
   if (config.get('db.wal')) {
-    db.pragma('journal_mode = WAL')
+    db.exec('PRAGMA journal_mode = WAL;')
+  }
+  // Callers pass whole item objects as parameters; ignore keys a statement doesn't use (as better-sqlite3 did)
+  const prepare = (sql) => {
+    const stmt = db.prepare(sql)
+    stmt.setAllowUnknownNamedParameters(true)
+    if (config.get('db.verbose')) {
+      for (const method of ['run', 'get', 'all', 'iterate']) {
+        const fn = stmt[method].bind(stmt)
+        stmt[method] = (...args) => { console.log(sql); return fn(...args) }
+      }
+    }
+    return stmt
   }
 
   // Init tables and prepare statements
   const st = {}
   for (const [k, v] of Object.entries(query)) {
-    k.startsWith('create') ? db.exec(v) : st[k] = db.prepare(v)
+    k.startsWith('create') ? db.exec(v) : st[k] = prepare(v)
     // Search statements are created on demand and cached.
     // Why? "ORDER BY col_name" doesn't work in db.prepare() because it becomes "ORDER BY 'col_name'".
     st._cache = {}
@@ -32,7 +40,7 @@ const instance = (() => {
         if (limit) stmt = `${stmt} LIMIT @limit`
         if (offset) stmt = `${stmt} offset @offset`
         stmt = `${stmt};`
-        st._cache[key] = db.prepare(stmt)
+        st._cache[key] = prepare(stmt)
         console.warn('!!! Statement prepared for:', key)
       }
       return st._cache[key]
