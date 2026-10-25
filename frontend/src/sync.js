@@ -12,6 +12,7 @@ const urlKeys = {
   page: v => Number(v),
   sortBy: v => v,
   sortAsc: v => v !== 'false',
+  segment: v => v === 'true',
   galleryKey: v => v || null
 }
 // Changing these adds a history entry; other changes replace the current one
