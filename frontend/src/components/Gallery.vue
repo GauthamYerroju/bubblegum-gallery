@@ -8,7 +8,7 @@
           :key="item.key"
       )
         img(v-if="item.dir" src="/img/folder.svg")
-        img.gallery-thumb-media.box.is-paddingless(v-if="!item.dir && item.src" :src="item.src")
+        img.gallery-thumb-media.box.p-0(v-if="!item.dir && item.src" :src="item.src")
         span(v-if="!item.dir && !item.src") No Thumb
 </template>
 
@@ -18,7 +18,6 @@ import { useSourcesStore } from '@/stores/sources'
 
 export default {
   name: 'Gallery',
-  emits: ['keyChange'],
   props: {
     currentKey: {
       type: String,
@@ -29,6 +28,7 @@ export default {
       default: () => []
     }
   },
+  emits: ['keyChange'],
   data () {
     return {
       mouseNavigating: false,

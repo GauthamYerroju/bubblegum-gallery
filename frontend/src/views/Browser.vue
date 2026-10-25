@@ -254,7 +254,7 @@ export default {
       })
       return Object.entries(rawGroups)
         .map(([key, items]) => {
-          // eslint-disable-next-line
+           
           let sortKey = "";
           let headerText = ''
           if (key === 'dont-group') {

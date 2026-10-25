@@ -3,7 +3,7 @@
     div.item-actions
     div.item-content
       img(v-if="renderItem.dir" src="/img/folder.svg")
-      img.lazy.box.is-paddingless.item-media(v-if="!renderItem.dir && renderItem.src" :data-src="renderItem.src")
+      img.lazy.box.p-0.item-media(v-if="!renderItem.dir && renderItem.src" :data-src="renderItem.src")
       span(v-if="!renderItem.dir && !renderItem.src") No Thumb
     div.item-name.has-text-centered
       | {{ item.name }}
@@ -15,7 +15,6 @@ import { useSourcesStore } from '@/stores/sources'
 
 export default {
   name: 'Item',
-  emits: ['open'],
   props: {
     item: {
       type: Object,
@@ -25,6 +24,7 @@ export default {
       })
     }
   },
+  emits: ['open'],
   computed: {
     ...mapState(useSourcesStore, ['urlGetFile', 'urlGetThumbnail']),
     renderItem () {

@@ -15,7 +15,6 @@ import Item from '@/components/Item.vue'
 
 export default {
   name: 'ItemContainer',
-  emits: ['open'],
   components: {
     Item
   },
@@ -28,7 +27,8 @@ export default {
       type: Array,
       default: () => []
     }
-  }
+  },
+  emits: ['open']
 }
 </script>
 
