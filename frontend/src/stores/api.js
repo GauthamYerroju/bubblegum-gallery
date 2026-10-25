@@ -14,10 +14,10 @@ export const useApiStore = defineStore('api', {
       return axios.get(useSourcesStore().urlListDir(path))
     },
     getFile (path) {
-      return axios.get(useSourcesStore().urlListDir(path))
+      return axios.get(useSourcesStore().urlGetFile(path), { responseType: 'blob' })
     },
     getThumbnail (path) {
-      return axios.get(useSourcesStore().urlListDir(path))
+      return axios.get(useSourcesStore().urlGetThumbnail(path), { responseType: 'blob' })
     },
     doScan () {
       return axios.get(useSourcesStore().urlDoScan())

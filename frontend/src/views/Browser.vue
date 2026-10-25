@@ -290,6 +290,9 @@ export default {
               return -1
             }
           }
+          if (b.sortKey === 'Folder') {
+            return 1
+          }
           if (a.sortKey === b.sortKey) {
             // Tie-break by header text
             return a.headerText === b.headerText

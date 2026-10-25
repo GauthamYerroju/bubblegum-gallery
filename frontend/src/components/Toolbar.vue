@@ -32,7 +32,7 @@
                 :class="{'is-active': (i == parts.length - 1)}"
                 @click="setPath(i)"
               )
-                a(href="#" :class="{'has-text-light': (i == parts.length - 1)}") {{ part }}
+                a(:class="{'has-text-light': (i == parts.length - 1)}") {{ part }}
         .navbar-end
           .navbar-item
             .buttons.has-addons
